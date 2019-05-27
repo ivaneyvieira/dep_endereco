@@ -1,0 +1,11 @@
+@startuml
+  class MapaDepositoView
+	class MapaDepositoPresenter
+	class MapaDeposito
+	class MapaRuasPredios
+  class MapaPredioNivel
+	MapaDepositoView --> MapaDepositoPresenter
+	MapaDepositoView -->  MapaDeposito
+	MapaDeposito --> MapaRuasPredios
+	MapaDeposito --> MapaPredioNivel
+@enduml

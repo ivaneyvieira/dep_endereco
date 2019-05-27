@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <alterColumn columnName="nivel_id" tableName="aptos" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="endereco_id" tableName="aptos" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <addUniqueConstraint constraintName="uq_aptos_nivel_id_numero" tableName="aptos" columnNames="DROP CONSTRAINT" nullableColumns="nivel_id"/>
+        <addUniqueConstraint constraintName="uq_aptos_nivel_id_numero" tableName="aptos" columnNames="nivel_id,numero" nullableColumns="" oneToOne="false"/>
+        <alterColumn columnName="procduto_id" tableName="kardec" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="movimentacao_id" tableName="movprodutos" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="produto_id" tableName="movprodutos" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <addUniqueConstraint constraintName="uq_movprodutos_produto_id_movimentacao_id" tableName="movprodutos" columnNames="DROP CONSTRAINT" nullableColumns="produto_id,movimentacao_id"/>
+        <addUniqueConstraint constraintName="uq_movprodutos_produto_id_movimentacao_id" tableName="movprodutos" columnNames="produto_id,movimentacao_id" nullableColumns="" oneToOne="false"/>
+        <alterColumn columnName="predio_id" tableName="niveis" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <addUniqueConstraint constraintName="uq_niveis_predio_id_numero_tipo_nivel" tableName="niveis" columnNames="DROP CONSTRAINT" nullableColumns="predio_id"/>
+        <addUniqueConstraint constraintName="uq_niveis_predio_id_numero_tipo_nivel" tableName="niveis" columnNames="predio_id,numero,tipo_nivel" nullableColumns="" oneToOne="false"/>
+        <alterColumn columnName="rua_id" tableName="predios" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <addUniqueConstraint constraintName="uq_predios_rua_id_numero" tableName="predios" columnNames="DROP CONSTRAINT" nullableColumns="rua_id"/>
+        <addUniqueConstraint constraintName="uq_predios_rua_id_numero" tableName="predios" columnNames="rua_id,numero" nullableColumns="" oneToOne="false"/>
+        <alterColumn columnName="endereco_id" tableName="saldos" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="produto_id" tableName="saldos" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <addUniqueConstraint constraintName="uq_saldos_endereco_id_produto_id" tableName="saldos" columnNames="DROP CONSTRAINT" nullableColumns="endereco_id,produto_id"/>
+        <addUniqueConstraint constraintName="uq_saldos_endereco_id_produto_id" tableName="saldos" columnNames="endereco_id,produto_id" nullableColumns="" oneToOne="false"/>
+        <alterColumn columnName="mov_produto_id" tableName="transferencias" currentType="bigint" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="endereco_s_id" tableName="transferencias" currentType="bigint" notnull="true" currentNotnull="false"/>
+    </changeSet>
+</migration>

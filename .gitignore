@@ -1,0 +1,17 @@
+bin
+out
+build
+.idea
+gradle
+gradlew*
+src/main/webapp/VAADIN/widgetsets
+src/main/webapp/VAADIN/gwt-unitCache
+.designer
+.settings
+.vscode
+.classpath
+.project
+*.iml
+Procfile
+deploy.sh
+.gradle

@@ -1,0 +1,10 @@
+@startuml
+actor Usuário
+Usuário		->	FormView	: enter(viewChangeEvent)
+FormView	->	FormView	: buildLayout()
+FormView	->	FormView	: enterView(parameters)
+FormView	->	ViewModel	: processaParametros(parameters)
+FormView	->	ViewModel	: openModel()
+ViewModel	->	ViewModel	: reloadModel()
+ViewModel	->	ViewModel	: updateView()
+@enduml

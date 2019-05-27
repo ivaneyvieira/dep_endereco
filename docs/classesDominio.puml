@@ -1,0 +1,98 @@
+@startuml
+
+class Apto {
+  numero: String
+  tipoPalet: EPalet
+  tipoAltura: ETipoAltura
+}
+
+Apto -D-> Endereco
+Apto -U-> Nivel
+
+class Endereco {
+  tipoEndereco: ETipoEndereco
+  observacao: String
+  localizacao: String
+  tipoNivel: ETipoNivel
+}
+
+class Movimentacao {
+  chave: String
+  documento: String
+  data: LocalDate
+  observacao: String
+  tipoMov: EMovTipo
+}
+
+class Nivel {
+  numero: String
+  _altura: BigDecimal
+  tipoNivel: ETipoNivel
+}
+
+Nivel -> Predio
+
+class MovProduto {
+  quantCan: BigDecimal
+  quantMov: BigDecimal
+  quantPalete: BigDecimal
+}
+
+MovProduto -U-> Movimentacao
+MovProduto -L-> Produto
+
+class Predio {
+  numero: String
+  lado: ELado
+}
+
+Predio -> Rua
+
+class Produto {
+  codbar: String
+  grade: String
+  nome: String
+  prdno: String
+  clno: Int
+  vendno: Int
+  custo: BigDecimal
+  preco: BigDecimal
+  quantVolumes: Int
+  estoqueMinimo: BigDecimal
+}
+
+
+class Rua {
+  numero: String
+}
+
+class Saldo {
+  capacidade: BigDecimal
+  saldoConfirmado: BigDecimal
+  saldoNConfirmado: BigDecimal
+}
+
+Saldo -U-> Endereco
+Saldo -R-> Produto
+
+class Transferencia{
+  dataHoraMov: LocalDateTime
+  observacao: String
+  quantMov: BigDecimal
+  confirmacao: Boolean
+}
+
+Transferencia -L-> Endereco : Saida
+Transferencia -L-> Endereco : Entrada
+Transferencia -D-> MovProduto
+
+class OrdemServico {
+  numero : Long
+  dataHora : LocalDateTime
+  dataHoraConf : LocalDateTime
+  empilhador: User
+  status : EOsStatus
+}
+
+OrdemServico -D-> Transferencia
+@enduml

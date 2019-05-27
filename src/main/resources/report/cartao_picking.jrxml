@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.3.final using JasperReports Library version 6.4.3  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Placa de Picking" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="NoPages" columnWidth="786" leftMargin="28" rightMargin="28" topMargin="28" bottomMargin="28" uuid="5e9bcc83-24bd-4dcf-858c-a83f0f2c7f2c">
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="dep_endereco"/>
+    <property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+    <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="0"/>
+    <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="1000"/>
+    <property name="com.jaspersoft.studio.unit." value="cm"/>
+    <property name="com.jaspersoft.studio.report.description" value=""/>
+    <property name="com.jaspersoft.studio.unit.pageHeight" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.pageWidth" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.topMargin" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.bottomMargin" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.leftMargin" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.rightMargin" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.columnWidth" value="cm"/>
+    <property name="com.jaspersoft.studio.unit.columnSpacing" value="cm"/>
+    <style name="LabelPequeno" fontName="SansSerif" fontSize="24" isBold="true"/>
+    <style name="CodigoGrande" fontName="SansSerif" fontSize="130" isBold="true"/>
+    <style name="CampoNormal" fontName="SansSerif" fontSize="36" isBold="true"/>
+    <queryString>
+        <![CDATA[select CONCAT(TRIM(prdno), ' ', grade) as codigo,
+  P.nome as descricao, RPAD(P.vendno, 10, ' ') as fornecedor, E.localizacao as endereco,
+  T.quantMov, T.dataHoraMov as dataHora
+FROM transferencias AS T
+  INNER JOIN movprodutos AS M
+    ON M.id = T.idMovProduto
+  INNER JOIN produtos AS P
+    ON P.id = M.idProduto
+  INNER JOIN enderecos AS E
+    ON E.id = T.idEnderecoEnt
+WHERE T.id = (select max(id) from transferencias)]]>
+    </queryString>
+    <field name="codigo">
+        <property name="com.jaspersoft.studio.field.label" value="codigo"/>
+    </field>
+    <field name="descricao">
+        <property name="com.jaspersoft.studio.field.label" value="descricao"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="produtos"/>
+    </field>
+    <field name="fornecedor" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.label" value="fornecedor"/>
+    </field>
+    <field name="endereco" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.label" value="endereco"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="enderecos"/>
+    </field>
+    <field name="quantMov" class="java.math.BigDecimal">
+        <property name="com.jaspersoft.studio.field.label" value="quantMov"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="transferencias"/>
+    </field>
+    <field name="dataHora" class="java.sql.Timestamp">
+        <property name="com.jaspersoft.studio.field.label" value="dataHora"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="transferencias"/>
+    </field>
+    <detail>
+        <band height="539" splitType="Stretch">
+            <textField>
+                <reportElement style="LabelPequeno" x="0" y="0" width="187" height="40" uuid="e1f8cc1e-47b2-4c3e-b961-4cc21fec7eac"/>
+                <textFieldExpression><![CDATA["Código"]]></textFieldExpression>
+            </textField>
+            <textField isStretchWithOverflow="true">
+                <reportElement style="CodigoGrande" x="0" y="-30" width="780" height="342" uuid="975b1f87-48aa-474b-9d7c-ff13cadf06a9"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <paragraph lineSpacing="AtLeast" lineSpacingSize="1.0"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="LabelPequeno" x="0" y="312" width="570" height="40" uuid="f32ab43d-0563-4453-aa7f-fa1cf5b22feb"/>
+                <textFieldExpression><![CDATA["Descrição do Produto"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="CampoNormal" x="0" y="352" width="786" height="50" uuid="bcefba56-5977-4278-b72f-60f8cd0a43e4"/>
+                <textFieldExpression><![CDATA[$F{descricao}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="LabelPequeno" x="0" y="402" width="200" height="40" uuid="cdea8917-9d56-45fe-99bd-3d3d09f9be09"/>
+                <textFieldExpression><![CDATA["Fornecedor"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="LabelPequeno" x="210" y="402" width="200" height="40" uuid="5a2d0133-51c9-4bc1-96ba-39c8e80b163f"/>
+                <textFieldExpression><![CDATA["End. Picking"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="CampoNormal" x="0" y="442" width="200" height="50" uuid="3074ad25-d2d2-430d-93b3-5477c8176af6"/>
+                <textFieldExpression><![CDATA[$F{fornecedor}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="CampoNormal" x="210" y="442" width="330" height="50" uuid="e221e08e-e139-4989-b52f-595a8b8618c1"/>
+                <textFieldExpression><![CDATA[$F{endereco}]]></textFieldExpression>
+            </textField>
+            <textField pattern="#,##0.###;#,-##0.###">
+                <reportElement style="CampoNormal" x="570" y="442" width="210" height="50" uuid="561996cc-ff3a-4ec8-bc3e-2f696ec2673e"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA[$F{quantMov}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="LabelPequeno" x="0" y="492" width="194" height="40" uuid="43abc2d1-9c16-4da2-b214-9225319c9057"/>
+                <textFieldExpression><![CDATA["Data de Criação:"]]></textFieldExpression>
+            </textField>
+            <textField pattern="dd/MM/yyyy &apos;às&apos; HH:mm">
+                <reportElement style="LabelPequeno" x="220" y="492" width="560" height="40" uuid="54005798-4208-409f-b140-73e16f75152b"/>
+                <textFieldExpression><![CDATA[$F{dataHora}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement style="LabelPequeno" x="580" y="402" width="200" height="40" uuid="f3398d15-c284-4b22-9339-8012425126bc"/>
+                <textElement textAlignment="Right"/>
+                <textFieldExpression><![CDATA["Quantidade"]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>

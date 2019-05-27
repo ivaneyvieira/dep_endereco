@@ -1,0 +1,46 @@
+package br.com.astrosoft.model.framework.legado.beans
+
+import br.com.astrosoft.model.enderecamento.domain.Produto
+import br.com.astrosoft.model.framework.utils.lpad
+import java.math.BigDecimal
+
+data class ProdutoSaci(
+        var prdno: String? = null,
+        var grade: String? = null,
+        var nome: String? = null,
+        private var codbar: String? = null,
+        private var clno: Int? = null,
+        var vendno: Int? = null,
+        private var quantVolumes: Int? = null,
+        private var estoqueMinimo: Double? = null,
+        private var custo: Double? = null,
+        private var preco: Double? = null
+                      ) {
+  private fun getPrdnoSaci(): String {
+    return this.prdno.orEmpty().lpad(16, " ")
+  }
+  
+  fun saveProdutoSaci(): Produto {
+    val prdno = getPrdnoSaci().lpad(16, " ")
+    val grade = grade
+    val produto = Produto.findProduto(prdno, grade)
+    val produtoNovo = produto ?: Produto()
+    val produtoUpdate = updateProduto(produtoNovo)
+    produtoUpdate.save()
+    return produtoUpdate
+  }
+  
+  private fun updateProduto(produto: Produto): Produto {
+    produto.custo = BigDecimal.valueOf(custo ?: 0.000)
+    produto.preco = BigDecimal.valueOf(preco ?: 0.00)
+    produto.codbar = codbar ?: ""
+    produto.grade = grade ?: ""
+    produto.nome = nome ?: ""
+    produto.prdno = getPrdnoSaci()
+    produto.clno = clno ?: 0
+    produto.vendno = vendno ?: 0
+    produto.quantVolumes = quantVolumes ?: 0
+    produto.estoqueMinimo = BigDecimal(estoqueMinimo ?: 0.00)
+    return produto
+  }
+}

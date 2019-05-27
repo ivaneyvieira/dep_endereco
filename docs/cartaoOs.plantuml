@@ -1,0 +1,9 @@
+@startuml
+salt
+{+
+  <b>No. OS    | "0000001"
+  <b>Codigo    | "001010"                 | <b>Grade        | "XXXXX"
+  <b>Descricao | "CAMA CASAL MODELO XXXX" | *               |*
+  <b>Quantidade| "0010"                   | "Palete Grande" |*
+}
+@enduml

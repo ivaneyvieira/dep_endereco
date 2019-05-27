@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply">
+        <createTable name="aptos" identityType="identity" pkName="pk_aptos">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="numero" type="varchar(2)" notnull="true"/>
+            <column name="tipo_palet" type="varchar(1)" notnull="true" checkConstraint="check ( tipo_palet in ('P','G','T','X'))" checkConstraintName="ck_aptos_tipo_palet"/>
+            <column name="tipo_altura" type="varchar(5)" notnull="true" checkConstraint="check ( tipo_altura in ('ALTA','MEDIA','BAIXA'))" checkConstraintName="ck_aptos_tipo_altura"/>
+            <column name="nivel_id" type="bigint" references="niveis.id" foreignKeyName="fk_aptos_nivel_id" foreignKeyIndex="ix_aptos_nivel_id"/>
+            <column name="endereco_id" type="bigint" uniqueOneToOne="uq_aptos_endereco_id" references="enderecos.id" foreignKeyName="fk_aptos_endereco_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_aptos_nivel_id_numero" columnNames="nivel_id,numero" oneToOne="false" nullableColumns="nivel_id"/>
+        </createTable>
+        <createTable name="enderecos" identityType="identity" pkName="pk_enderecos">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="tipo_endereco" type="varchar(11)" notnull="true" checkConstraint="check ( tipo_endereco in ('DEPOSITO','RECEBIMENTO','EXPEDICAO'))" checkConstraintName="ck_enderecos_tipo_endereco"/>
+            <column name="observacao" type="varchar(100)" notnull="true"/>
+            <column name="localizacao" type="varchar(25)" notnull="true"/>
+            <column name="tipo_nivel" type="varchar(7)" notnull="true" checkConstraint="check ( tipo_nivel in ('PICKING','PULMAO'))" checkConstraintName="ck_enderecos_tipo_nivel"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_enderecos_tipo_endereco_localizacao_tipo_nivel" columnNames="tipo_endereco,localizacao,tipo_nivel" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="kardec" identityType="identity" pkName="pk_kardec">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="procduto_id" type="bigint" references="produtos.id" foreignKeyName="fk_kardec_procduto_id" foreignKeyIndex="ix_kardec_procduto_id"/>
+            <column name="date" type="date" notnull="true"/>
+            <column name="tipo" type="varchar(2)" notnull="true" checkConstraint="check ( tipo in ('CP','MG','NT'))" checkConstraintName="ck_kardec_tipo"/>
+            <column name="operacao" type="varchar(2)" notnull="true" checkConstraint="check ( operacao in ('CP','VD','TF','DV','OU'))" checkConstraintName="ck_kardec_operacao"/>
+            <column name="es" type="varchar(1)" notnull="true" checkConstraint="check ( es in ('E','S'))" checkConstraintName="ck_kardec_es"/>
+            <column name="quant" type="decimal(10,4)" notnull="true"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="movprodutos" identityType="identity" pkName="pk_movprodutos">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="quant_can" type="decimal(10,4)" notnull="true"/>
+            <column name="quant_mov" type="decimal(10,4)" notnull="true"/>
+            <column name="quant_palete" type="decimal(10,4)" notnull="true"/>
+            <column name="movimentacao_id" type="bigint" references="movimentacoes.id" foreignKeyName="fk_movprodutos_movimentacao_id" foreignKeyIndex="ix_movprodutos_movimentacao_id"/>
+            <column name="produto_id" type="bigint" references="produtos.id" foreignKeyName="fk_movprodutos_produto_id" foreignKeyIndex="ix_movprodutos_produto_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_movprodutos_produto_id_movimentacao_id" columnNames="produto_id,movimentacao_id" oneToOne="false" nullableColumns="produto_id,movimentacao_id"/>
+        </createTable>
+        <createTable name="movimentacoes" identityType="identity" pkName="pk_movimentacoes">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="chave" type="varchar(20)" notnull="true"/>
+            <column name="documento" type="varchar(20)" notnull="true"/>
+            <column name="data" type="date" notnull="true"/>
+            <column name="observacao" type="varchar(100)" notnull="true"/>
+            <column name="tipo_mov" type="varchar(13)" notnull="true" checkConstraint="check ( tipo_mov in ('ENTRADA','SAIDA','PICKING','TRANSFERENCIA'))" checkConstraintName="ck_movimentacoes_tipo_mov"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_movimentacoes_chave" columnNames="chave" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="niveis" identityType="identity" pkName="pk_niveis">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="numero" type="varchar(2)" notnull="true"/>
+            <column name="altura" type="decimal(10,4)" notnull="true"/>
+            <column name="tipo_nivel" type="varchar(7)" notnull="true" checkConstraint="check ( tipo_nivel in ('PICKING','PULMAO'))" checkConstraintName="ck_niveis_tipo_nivel"/>
+            <column name="predio_id" type="bigint" references="predios.id" foreignKeyName="fk_niveis_predio_id" foreignKeyIndex="ix_niveis_predio_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_niveis_predio_id_numero_tipo_nivel" columnNames="predio_id,numero,tipo_nivel" oneToOne="false" nullableColumns="predio_id"/>
+        </createTable>
+        <createTable name="ordensservico" identityType="identity" pkName="pk_ordensservico">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="transferencia_id" type="bigint" references="transferencias.id" foreignKeyName="fk_ordensservico_transferencia_id" foreignKeyIndex="ix_ordensservico_transferencia_id"/>
+            <column name="numero" type="bigint" notnull="true"/>
+            <column name="data_hora" type="timestamp" notnull="true"/>
+            <column name="data_hora_conf" type="timestamp"/>
+            <column name="user_id" type="bigint" references="users.id" foreignKeyName="fk_ordensservico_user_id" foreignKeyIndex="ix_ordensservico_user_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_ordensservico_numero" columnNames="numero" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="predios" identityType="identity" pkName="pk_predios">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="numero" type="varchar(2)" notnull="true"/>
+            <column name="lado" type="varchar(5)" notnull="true" checkConstraint="check ( lado in ('PAR','IMPAR'))" checkConstraintName="ck_predios_lado"/>
+            <column name="rua_id" type="bigint" references="ruas.id" foreignKeyName="fk_predios_rua_id" foreignKeyIndex="ix_predios_rua_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_predios_rua_id_numero" columnNames="rua_id,numero" oneToOne="false" nullableColumns="rua_id"/>
+        </createTable>
+        <createTable name="produtos" identityType="identity" pkName="pk_produtos">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="codbar" type="varchar(16)" notnull="true"/>
+            <column name="grade" type="varchar(8)" notnull="true"/>
+            <column name="nome" type="varchar(40)" notnull="true"/>
+            <column name="prdno" type="varchar(16)" notnull="true"/>
+            <column name="clno" type="integer" notnull="true"/>
+            <column name="vendno" type="integer" notnull="true"/>
+            <column name="custo" type="decimal(10,4)" notnull="true"/>
+            <column name="preco" type="decimal(10,4)" notnull="true"/>
+            <column name="quant_volumes" type="integer" notnull="true"/>
+            <column name="estoque_minimo" type="decimal(10,4)" notnull="true"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_produtos_prdno_grade" columnNames="prdno,grade" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="roles" identityType="identity" pkName="pk_roles">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="name" type="varchar(20)" notnull="true"/>
+            <column name="tag" type="varchar(25)" notnull="true"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_roles_name" columnNames="name" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="ruas" identityType="identity" pkName="pk_ruas">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="numero" type="varchar(2)" notnull="true"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_ruas_numero" columnNames="numero" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="saldos" identityType="identity" pkName="pk_saldos">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="capacidade" type="decimal(10,4)" notnull="true"/>
+            <column name="saldo_confirmado" type="decimal(10,4)" notnull="true"/>
+            <column name="saldo_nconfirmado" type="decimal(10,4)" notnull="true"/>
+            <column name="ult_saida" type="date"/>
+            <column name="ult_entrada" type="date"/>
+            <column name="endereco_id" type="bigint" references="enderecos.id" foreignKeyName="fk_saldos_endereco_id" foreignKeyIndex="ix_saldos_endereco_id"/>
+            <column name="produto_id" type="bigint" references="produtos.id" foreignKeyName="fk_saldos_produto_id" foreignKeyIndex="ix_saldos_produto_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_saldos_endereco_id_produto_id" columnNames="endereco_id,produto_id" oneToOne="false" nullableColumns="endereco_id,produto_id"/>
+        </createTable>
+        <createTable name="transferencias" identityType="identity" pkName="pk_transferencias">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="data_hora_mov" type="timestamp" notnull="true"/>
+            <column name="observacao" type="varchar(100)"/>
+            <column name="quant_mov" type="decimal(10,4)" notnull="true"/>
+            <column name="confirmacao" type="boolean" defaultValue="false" notnull="true"/>
+            <column name="endereco_e_id" type="bigint" references="enderecos.id" foreignKeyName="fk_transferencias_endereco_e_id" foreignKeyIndex="ix_transferencias_endereco_e_id"/>
+            <column name="mov_produto_id" type="bigint" references="movprodutos.id" foreignKeyName="fk_transferencias_mov_produto_id" foreignKeyIndex="ix_transferencias_mov_produto_id"/>
+            <column name="endereco_s_id" type="bigint" references="enderecos.id" foreignKeyName="fk_transferencias_endereco_s_id" foreignKeyIndex="ix_transferencias_endereco_s_id"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+        </createTable>
+        <createTable name="users" identityType="identity" pkName="pk_users">
+            <column name="id" type="bigint" primaryKey="true"/>
+            <column name="version" type="integer" notnull="true"/>
+            <column name="user_name" type="varchar(20)" notnull="true"/>
+            <column name="foto_perfil" type="blob" notnull="true"/>
+            <column name="chapa" type="varchar(10)" notnull="true"/>
+            <column name="user_saci" type="varchar(15)" notnull="true"/>
+            <column name="first_name" type="varchar(60)" notnull="true"/>
+            <column name="last_name" type="varchar(60)" notnull="true"/>
+            <column name="title" type="varchar(60)" notnull="true"/>
+            <column name="passw" type="varchar(60)" notnull="true"/>
+            <column name="created_at" type="timestamp" notnull="true"/>
+            <column name="updated_at" type="timestamp" notnull="true"/>
+            <uniqueConstraint name="uq_users_user_name" columnNames="user_name" oneToOne="false" nullableColumns=""/>
+            <uniqueConstraint name="uq_users_chapa" columnNames="chapa" oneToOne="false" nullableColumns=""/>
+            <uniqueConstraint name="uq_users_user_saci" columnNames="user_saci" oneToOne="false" nullableColumns=""/>
+        </createTable>
+        <createTable name="users_roles" pkName="pk_users_roles">
+            <column name="users_id" type="bigint" notnull="true" primaryKey="true"/>
+            <column name="roles_id" type="bigint" notnull="true" primaryKey="true"/>
+            <foreignKey name="fk_users_roles_users" columnNames="users_id" refColumnNames="id" refTableName="users" indexName="ix_users_roles_users"/>
+            <foreignKey name="fk_users_roles_roles" columnNames="roles_id" refColumnNames="id" refTableName="roles" indexName="ix_users_roles_roles"/>
+        </createTable>
+        <createIndex indexName="ix_kardec_date" tableName="kardec" columns="date"/>
+        <createIndex indexName="ix_produtos_codbar" tableName="produtos" columns="codbar"/>
+        <createIndex indexName="ix_transferencias_mov_produto_id_endereco_e_id_endereco_s_1" tableName="transferencias" columns="mov_produto_id,endereco_e_id,endereco_s_id"/>
+    </changeSet>
+</migration>

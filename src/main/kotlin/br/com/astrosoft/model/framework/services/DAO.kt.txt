@@ -1,0 +1,78 @@
+package br.com.astrosoft.model.framework.services
+
+import br.com.astrosoft.model.framework.entityManager.DB
+import br.com.astrosoft.model.framework.domain.EntityJPA
+import com.querydsl.core.dml.DMLClause
+import com.querydsl.core.types.Predicate
+import com.querydsl.core.types.dsl.EntityPathBase
+import com.querydsl.jpa.impl.JPAQuery
+import com.querydsl.jpa.impl.JPAQueryFactory
+import javax.persistence.EntityManager
+
+open class DAO<ENTITY : EntityJPA, out QENTITY : EntityPathBase<ENTITY>>(val qEntity: QENTITY) {
+  fun findById(id: Long): ENTITY? {
+    return DB.findById(qEntity.type, id)
+  }
+  
+  fun findAll(): List<ENTITY> {
+    return DB.findAll(qEntity.type)
+  }
+  
+  fun find(predicate: (QENTITY) -> Predicate): List<ENTITY> {
+    val q = qEntity
+    return DB.xaQuery { it.select(q).from(q).where(predicate(q)).fetch() }
+  }
+}
+
+inline fun <reified T : EntityJPA> sqlEntity(
+        sql: String,
+        vararg params: Pair<String, Any?>
+                                            ): List<T> {
+  return DB.sqlEntity(sql, *params)
+}
+
+fun <R> fetch(lambda: (JPAQueryFactory) -> JPAQuery<R>): List<R> {
+  return xaQuery { query ->
+    val jpaQuery = lambda(query)
+    jpaQuery.fetchAll().fetch()
+  }
+}
+
+fun execute(lambda: (JPAQueryFactory) -> DMLClause<*>): Long {
+  return xaQuery { query ->
+    val dmlClause = lambda(query)
+    dmlClause.execute()
+  }
+}
+
+fun <R> fetchOne(lambda: (JPAQueryFactory) -> JPAQuery<R>): R? {
+  return xaQuery { query ->
+    val jpaQuery = lambda(query)
+    jpaQuery.fetchOne()
+  }
+}
+
+fun <R> fetchFirst(lambda: (JPAQueryFactory) -> JPAQuery<R>): R? {
+  return xaQuery { query ->
+    val jpaQuery = lambda(query)
+    jpaQuery.fetchFirst()
+  }
+}
+
+private fun <R> xaQuery(lambda: (JPAQueryFactory) -> R): R {
+  return DB.xaQuery(lambda)
+}
+
+fun <R> xaDao(lambda: (EntityManager) -> R): R {
+  return DB.xa(lambda)
+}
+
+/*
+inline fun <reified R : EntityJPA, Q : EntityPathBase<R>> DAO<R, Q>.findById(id: Long): R? {
+  return DB.findById(R::class.java, id)
+}
+
+inline fun <reified R : EntityJPA, Q : EntityPathBase<R>> DAO<R, Q>.findAll(): List<R> {
+  return DB.findAll(R::class.java)
+}
+        */

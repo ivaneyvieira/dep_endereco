@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="enderecos" columnCount="2" printOrder="Horizontal" pageWidth="595" pageHeight="842" columnWidth="239" columnSpacing="39" leftMargin="39" rightMargin="39" topMargin="28" bottomMargin="28" uuid="0b6aab20-16e4-4d4e-9e98-ad4ef0fef0b5">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
+	<property name="com.jaspersoft.studio.unit." value="mm"/>
+	<queryString language="SQL">
+		<![CDATA[select numero,
+  MID(descricao, 1, 8) as tipoNivel, 
+  MID(descricao, 9, 2) as rua, 
+  MID(descricao, 12, 2) as predio,  
+  MID(descricao, 15, 2) as nivel,
+  IF(MID(descricao, 12, 2) mod 2 = 0, 'PAR', 'IMPAR') as lado,
+  numero as localizacao
+from lote 
+where loja_id = 9
+HAVING tipoNivel like 'P%'
+ORDER BY rua, lado, predio, localizacao]]>
+	</queryString>
+	<field name="numero" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="numero"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="lote"/>
+	</field>
+	<field name="tipoNivel" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="tipoNivel"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="niveis"/>
+	</field>
+	<field name="rua" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="rua"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="ruas"/>
+	</field>
+	<field name="predio" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="predio"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="predios"/>
+	</field>
+	<field name="nivel" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="nivel"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="niveis"/>
+	</field>
+	<field name="lado" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="lado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="predios"/>
+	</field>
+	<field name="localizacao" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="localizacao"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="lote"/>
+	</field>
+	<detail>
+		<band height="153" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="-1" width="249" height="153" uuid="51b62549-5a1c-4354-b923-5072a98e8823"/>
+				<graphicElement>
+					<pen lineWidth="3.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField>
+				<reportElement x="15" y="30" width="40" height="20" uuid="bdadb8c5-7864-4447-89a2-87e588e9121c"/>
+				<textFieldExpression><![CDATA[$F{lado}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="15" y="10" width="30" height="20" uuid="172af357-1ed4-473a-897f-c7206c8553cd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lado]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="159" y="30" width="80" height="20" uuid="942485b2-7802-4d46-997c-e108dd3c69a5"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{tipoNivel}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="159" y="10" width="80" height="20" uuid="d7437ed5-1f55-4f6b-9b3f-7cb32678eb18"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo de Nível]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="15" y="70" width="60" height="30" uuid="f919a085-e256-42bc-b0ab-b7b826a59697"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{rua}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="92" y="70" width="60" height="30" uuid="64d72477-79ae-4456-8afc-4b6b86db9837"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{predio}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="173" y="70" width="60" height="30" uuid="93ac818c-a7ea-4fa4-a921-088792ffb80e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nivel}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="15" y="50" width="60" height="20" uuid="89a14637-ac0c-4055-ae6f-7e1c14370508"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Rua]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="92" y="50" width="60" height="20" uuid="774de48f-4bc5-43a0-8f64-203a1b77a2f1"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Prédio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="FixRelativeToBottom" x="173" y="50" width="60" height="20" uuid="f4d38195-7762-44b7-86d2-626bdd43dbbf"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nível]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="75" y="115" width="98" height="30" uuid="53c0d141-5270-4b43-9830-70d850cf0677"/>
+				<jr:barbecue xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" type="Code128A" drawText="false" checksumRequired="false" barHeight="39">
+					<jr:codeExpression><![CDATA[$F{localizacao}]]></jr:codeExpression>
+				</jr:barbecue>
+			</componentElement>
+		</band>
+	</detail>
+</jasperReport>
