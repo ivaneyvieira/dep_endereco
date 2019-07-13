@@ -1,4 +1,3 @@
-import com.sun.javafx.scene.CameraHelper.project
 import io.ebean.gradle.EnhancePluginExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -19,7 +18,7 @@ buildscript {
 }
 
 plugins {
-  id("org.jetbrains.kotlin.jvm") version "1.3.31"
+  id("org.jetbrains.kotlin.jvm") version "1.3.41"
   id("org.gretty") version "2.3.1"
   id("com.devsoap.plugin.vaadin") version "1.4.1"
   war
@@ -48,7 +47,7 @@ gretty {
 }
 
 vaadin {
-  version = "8.5.2"
+  version = "8.8.5"
 }
 
 configure<EnhancePluginExtension> {
