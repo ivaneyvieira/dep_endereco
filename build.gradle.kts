@@ -51,7 +51,7 @@ vaadin {
 }
 
 configure<EnhancePluginExtension> {
-  debugLevel = 0
+  debugLevel = 1
 }
 
 val compileKotlin: KotlinCompile by tasks

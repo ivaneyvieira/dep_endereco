@@ -1,4 +1,4 @@
-profile-location: true
+profile-location: false
 entity-packages: br.com.astrosoft.model.enderecamento.domain
 transactional-packages: br.com.astrosoft
 querybean-packages: br.com.astrosoft
