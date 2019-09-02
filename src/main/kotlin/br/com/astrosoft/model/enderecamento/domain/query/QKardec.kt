@@ -5,7 +5,7 @@ import br.com.astrosoft.model.enderecamento.domain.EOperacaoKardec
 import br.com.astrosoft.model.enderecamento.domain.ETipoKardec
 import br.com.astrosoft.model.enderecamento.domain.Kardec
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocProduto
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PBigDecimal
 import io.ebean.typequery.PEnum
 import io.ebean.typequery.PInteger
@@ -44,12 +44,12 @@ class QKardec : TQRootBean<Kardec, QKardec> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Kardec::class.java, server)
+  constructor(database: Database) : super(Kardec::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Kardec::class.java)
 

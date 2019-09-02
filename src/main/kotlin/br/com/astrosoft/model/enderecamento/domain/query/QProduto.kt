@@ -3,7 +3,7 @@ package br.com.astrosoft.model.enderecamento.domain.query
 import br.com.astrosoft.model.enderecamento.domain.Produto
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocMovProduto
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocSaldo
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PBigDecimal
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
@@ -47,12 +47,12 @@ class QProduto : TQRootBean<Produto, QProduto> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Produto::class.java, server)
+  constructor(database: Database) : super(Produto::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Produto::class.java)
 

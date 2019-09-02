@@ -5,7 +5,7 @@ import br.com.astrosoft.model.enderecamento.domain.EPalet
 import br.com.astrosoft.model.enderecamento.domain.ETipoAltura
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocEndereco
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocNivel
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PEnum
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
@@ -42,12 +42,12 @@ class QApto : TQRootBean<Apto, QApto> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Apto::class.java, server)
+  constructor(database: Database) : super(Apto::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Apto::class.java)
 

@@ -2,7 +2,7 @@ package br.com.astrosoft.model.enderecamento.domain.query
 
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocPredio
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
 import io.ebean.typequery.PLong
@@ -35,12 +35,12 @@ class QRua : TQRootBean<Rua, QRua> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Rua::class.java, server)
+  constructor(database: Database) : super(Rua::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Rua::class.java)
 

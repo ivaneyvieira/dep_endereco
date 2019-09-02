@@ -11,6 +11,7 @@ import br.com.astrosoft.view.framework.vaadin.dsls.columnButton
 import br.com.astrosoft.view.framework.vaadin.dsls.columnLocalDate
 import br.com.astrosoft.view.framework.vaadin.dsls.columnQuant
 import br.com.astrosoft.view.framework.vaadin.dsls.config
+import br.com.astrosoft.view.framework.vaadin.dsls.nav
 import br.com.astrosoft.view.framework.vaadin.fields.GridEditField
 import br.com.astrosoft.viewmodel.enderecamento.presenters.enderecamentoProduto.TransferenciaEntradaGridModel
 import com.vaadin.icons.VaadinIcons
@@ -34,7 +35,6 @@ class TransferenciaEntradaGrid(private val model: TransferenciaEntradaGridModel)
     val comboPalete = buildComboPalete()
     
     grid.config {
-      //nav()
       columnLocalDate({ it.dataHoraMov }) {
         caption = "Data e Hora"
         expandRatio = 2

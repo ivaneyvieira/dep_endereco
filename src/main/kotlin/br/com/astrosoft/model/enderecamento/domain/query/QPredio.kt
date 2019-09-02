@@ -4,7 +4,7 @@ import br.com.astrosoft.model.enderecamento.domain.ELado
 import br.com.astrosoft.model.enderecamento.domain.Predio
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocNivel
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocRua
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PEnum
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
@@ -40,12 +40,12 @@ class QPredio : TQRootBean<Predio, QPredio> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Predio::class.java, server)
+  constructor(database: Database) : super(Predio::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Predio::class.java)
 

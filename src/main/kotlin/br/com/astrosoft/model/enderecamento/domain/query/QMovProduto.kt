@@ -4,7 +4,7 @@ import br.com.astrosoft.model.enderecamento.domain.MovProduto
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocMovimentacao
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocProduto
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocTransferencia
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PBigDecimal
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
@@ -42,12 +42,12 @@ class QMovProduto : TQRootBean<MovProduto, QMovProduto> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(MovProduto::class.java, server)
+  constructor(database: Database) : super(MovProduto::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(MovProduto::class.java)
 

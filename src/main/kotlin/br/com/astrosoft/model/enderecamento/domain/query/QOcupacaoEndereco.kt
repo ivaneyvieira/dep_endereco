@@ -8,7 +8,7 @@ import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocEndereco
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocNivel
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocPredio
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocRua
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PEnum
 import io.ebean.typequery.PLong
 import io.ebean.typequery.PString
@@ -44,12 +44,12 @@ class QOcupacaoEndereco : TQRootBean<OcupacaoEndereco, QOcupacaoEndereco> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(OcupacaoEndereco::class.java, server)
+  constructor(database: Database) : super(OcupacaoEndereco::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(OcupacaoEndereco::class.java)
 

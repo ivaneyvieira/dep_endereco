@@ -36,20 +36,6 @@ abstract class GridField<BEAN : Any>(
     return grid
   }
   
-  fun addSelectionListener(event: (Set<BEAN>) -> Unit) {
-    val model = grid.selectionModel
-    when (model) {
-      is MultiSelectionModel  -> {
-        model.addMultiSelectionListener { e -> event(e.allSelectedItems) }
-      }
-      is SingleSelectionModel -> {
-        model.addSingleSelectionListener { e -> event(setOf(e.selectedItem.orElse(null)).filterNotNull().toSet()) }
-      }
-      else                    -> {
-      }
-    }
-  }
-  
   protected fun enableEditor(actionSaveBean: EditorSaveListener<BEAN>, actionCancelBean: EditorCancelListener<BEAN>) {
     this.grid.editor?.let { editor ->
       editor.isEnabled = true
@@ -58,13 +44,6 @@ abstract class GridField<BEAN : Any>(
       editor.addSaveListener(actionSaveBean)
       editor.addCancelListener(actionCancelBean)
       editor.isBuffered = true
-      /*navigator?.let { nav ->
-        nav.edit
-        nav.addEditorCloseListener {
-          val bean = editor.binder.bean
-          actionSaveBean.onEditorSave(EditorSaveEvent<BEAN>(editor, bean))
-        }
-      }*/
     }
   }
   
@@ -89,7 +68,7 @@ abstract class GridField<BEAN : Any>(
     else {
       this.list = beans
       this.grid.setItems(this.list)
-      refresh()
+      //refresh()
     }
   }
   

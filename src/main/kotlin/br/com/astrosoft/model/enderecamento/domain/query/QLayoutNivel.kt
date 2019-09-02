@@ -1,7 +1,9 @@
 package br.com.astrosoft.model.enderecamento.domain.query
 
 import br.com.astrosoft.model.enderecamento.domain.LayoutNivel
-import io.ebean.EbeanServer
+import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocNivel
+import io.ebean.Database
+import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLong
 import io.ebean.typequery.PString
 import io.ebean.typequery.TQRootBean
@@ -25,15 +27,17 @@ class QLayoutNivel : TQRootBean<LayoutNivel, QLayoutNivel> {
 
   lateinit var id: PLong<QLayoutNivel>
   lateinit var layout: PString<QLayoutNivel>
+  lateinit var total: PInteger<QLayoutNivel>
+  lateinit var nivel: QAssocNivel<QLayoutNivel>
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(LayoutNivel::class.java, server)
+  constructor(database: Database) : super(LayoutNivel::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(LayoutNivel::class.java)
 

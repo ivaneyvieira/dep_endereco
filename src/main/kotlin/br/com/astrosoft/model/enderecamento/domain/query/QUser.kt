@@ -2,7 +2,7 @@ package br.com.astrosoft.model.enderecamento.domain.query
 
 import br.com.astrosoft.model.enderecamento.domain.User
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocRole
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
 import io.ebean.typequery.PLong
@@ -41,12 +41,12 @@ class QUser : TQRootBean<User, QUser> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(User::class.java, server)
+  constructor(database: Database) : super(User::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(User::class.java)
 

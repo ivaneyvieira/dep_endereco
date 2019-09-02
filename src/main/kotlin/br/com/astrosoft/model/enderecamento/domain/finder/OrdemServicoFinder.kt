@@ -5,20 +5,17 @@ import br.com.astrosoft.model.enderecamento.domain.query.QOrdemServico
 import io.ebean.Finder
 
 open class OrdemServicoFinder : Finder<Long, OrdemServico>(OrdemServico::class.java) {
-
-  val alias = QOrdemServico._alias
-
   /**
    * Start a new typed query.
    */
   fun where(): QOrdemServico {
-     return QOrdemServico(db())
+    return QOrdemServico(db())
   }
 
   /**
    * Start a new document store query.
    */
   fun text(): QOrdemServico {
-     return QOrdemServico(db()).text()
+    return QOrdemServico(db()).text()
   }
 }

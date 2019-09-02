@@ -7,6 +7,7 @@ import br.com.astrosoft.model.framework.utils.QUANT_FORMAT
 import br.com.astrosoft.view.framework.vaadin.Alignment
 import br.com.astrosoft.view.framework.vaadin.menu.BeanMenuItem
 import br.com.astrosoft.viewmodel.framework.viewmodel.View
+import com.vaadin.event.ShortcutAction.KeyCode
 import com.vaadin.icons.VaadinIcons
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
@@ -18,6 +19,7 @@ import com.vaadin.ui.renderers.DateRenderer
 import com.vaadin.ui.renderers.LocalDateTimeRenderer
 import com.vaadin.ui.renderers.NumberRenderer
 import com.vaadin.ui.themes.ValoTheme
+import org.vaadin.patrik.FastNavigation
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
@@ -110,6 +112,22 @@ fun <T> Grid<T>.columnButton(
   addColumn.setStyleGenerator { Alignment.center }
   addColumn.init()
   return addColumn
+}
+
+fun <T> Grid<T>.nav(execSave : (T) -> Unit){
+  editor.isEnabled = true
+  val nav = FastNavigation(this, false, true)
+  nav.changeColumnAfterLastRow = true
+  nav.openEditorWithSingleClick = true
+  nav.allowArrowToChangeRow = true
+  nav.openEditorOnTyping = true
+  nav.addEditorSaveShortcut(KeyCode.ENTER)
+  editor.cancelCaption = "Cancelar"
+  editor.saveCaption = "Salvar"
+  editor.isBuffered = false
+  editor.addSaveListener {
+    execSave(it.bean)
+  }
 }
 
 fun KClass<out View>.navigatorTo(parameterMap: Map<String, Any?>) {

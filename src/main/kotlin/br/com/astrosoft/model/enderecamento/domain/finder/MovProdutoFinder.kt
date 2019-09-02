@@ -5,20 +5,17 @@ import br.com.astrosoft.model.enderecamento.domain.query.QMovProduto
 import io.ebean.Finder
 
 open class MovProdutoFinder : Finder<Long, MovProduto>(MovProduto::class.java) {
-
-  val alias = QMovProduto._alias
-
   /**
    * Start a new typed query.
    */
   fun where(): QMovProduto {
-     return QMovProduto(db())
+    return QMovProduto(db())
   }
 
   /**
    * Start a new document store query.
    */
   fun text(): QMovProduto {
-     return QMovProduto(db()).text()
+    return QMovProduto(db()).text()
   }
 }

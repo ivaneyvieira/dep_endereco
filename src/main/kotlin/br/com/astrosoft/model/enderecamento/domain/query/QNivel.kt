@@ -3,8 +3,9 @@ package br.com.astrosoft.model.enderecamento.domain.query
 import br.com.astrosoft.model.enderecamento.domain.ETipoNivel
 import br.com.astrosoft.model.enderecamento.domain.Nivel
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocApto
+import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocLayoutNivel
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocPredio
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PBigDecimal
 import io.ebean.typequery.PEnum
 import io.ebean.typequery.PInteger
@@ -39,15 +40,16 @@ class QNivel : TQRootBean<Nivel, QNivel> {
   lateinit var tipoNivel: PEnum<QNivel,ETipoNivel>
   lateinit var predio: QAssocPredio<QNivel>
   lateinit var aptos: QAssocApto<QNivel>
+  lateinit var layout: QAssocLayoutNivel<QNivel>
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Nivel::class.java, server)
+  constructor(database: Database) : super(Nivel::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Nivel::class.java)
 

@@ -4,7 +4,7 @@ import br.com.astrosoft.model.enderecamento.domain.Transferencia
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocEndereco
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocMovProduto
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocOrdemServico
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PBigDecimal
 import io.ebean.typequery.PBoolean
 import io.ebean.typequery.PInteger
@@ -45,12 +45,12 @@ class QTransferencia : TQRootBean<Transferencia, QTransferencia> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Transferencia::class.java, server)
+  constructor(database: Database) : super(Transferencia::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Transferencia::class.java)
 

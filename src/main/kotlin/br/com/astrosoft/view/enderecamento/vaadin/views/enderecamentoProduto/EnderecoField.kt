@@ -42,9 +42,10 @@ class EnderecoField(private val model: TransferenciaEntradaGridModel, caption: S
     setFocusDelegate(this.textEndereco)
     return this.textEndereco
   }
-  
+
+
   private fun focusListener() {
-    val enderecos = model.enderecosDisponiveis + model.enderecosPicking
+    val enderecos =  model.enderecosDisponiveis + model.enderecosPicking
     this.enderecosDisponiveis = enderecos.distinct().sortedBy { it.descricao }.mapNotNull { it.descricao }
   }
   

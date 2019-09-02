@@ -5,7 +5,7 @@ import br.com.astrosoft.model.enderecamento.domain.ETipoNivel
 import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocApto
 import br.com.astrosoft.model.enderecamento.domain.query.assoc.QAssocSaldo
-import io.ebean.EbeanServer
+import io.ebean.Database
 import io.ebean.typequery.PEnum
 import io.ebean.typequery.PInteger
 import io.ebean.typequery.PLocalDateTime
@@ -44,12 +44,12 @@ class QEndereco : TQRootBean<Endereco, QEndereco> {
 
 
   /**
-   * Construct with a given EbeanServer.
+   * Construct with a given Database.
    */
-  constructor(server: EbeanServer) : super(Endereco::class.java, server)
+  constructor(database: Database) : super(Endereco::class.java, database)
 
   /**
-   * Construct using the default EbeanServer.
+   * Construct using the default Database.
    */
   constructor() : super(Endereco::class.java)
 
