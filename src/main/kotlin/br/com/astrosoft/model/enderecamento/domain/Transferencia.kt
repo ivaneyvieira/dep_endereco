@@ -17,6 +17,9 @@ import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
+import javax.persistence.PostPersist
+import javax.persistence.PostRemove
+import javax.persistence.PostUpdate
 import javax.persistence.Table
 import javax.persistence.Transient
 
@@ -101,6 +104,13 @@ class Transferencia : BaseModel() {
         save()
       }
     }
+  }
+
+  @PostRemove
+  @PostUpdate
+  @PostPersist
+  fun updateRegistros() {
+    RegistroEndereco.updateRegistros()
   }
 }
 

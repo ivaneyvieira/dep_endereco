@@ -6,6 +6,7 @@ import br.com.astrosoft.model.enderecamento.domain.MovProduto
 import br.com.astrosoft.model.enderecamento.domain.Movimentacao
 import br.com.astrosoft.model.enderecamento.domain.Produto
 import br.com.astrosoft.model.enderecamento.domain.Transferencia
+import br.com.astrosoft.model.enderecamento.domain.enderecoOcupado
 import br.com.astrosoft.model.framework.exceptions.ViewException
 import br.com.astrosoft.viewmodel.framework.viewmodel.ViewModel
 import java.math.BigDecimal

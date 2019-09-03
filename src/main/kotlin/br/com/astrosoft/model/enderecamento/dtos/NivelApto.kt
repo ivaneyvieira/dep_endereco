@@ -4,6 +4,7 @@ import br.com.astrosoft.model.enderecamento.domain.Apto
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.NAO_OCUPADO
 import br.com.astrosoft.model.enderecamento.domain.Nivel
+import br.com.astrosoft.model.enderecamento.domain.enderecoOcupado
 
 data class NivelApto(
   val nivel: Nivel,

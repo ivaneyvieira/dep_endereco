@@ -13,6 +13,9 @@ import javax.persistence.CascadeType.REFRESH
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.ManyToOne
+import javax.persistence.PostPersist
+import javax.persistence.PostRemove
+import javax.persistence.PostUpdate
 import javax.persistence.Table
 
 @Entity
@@ -70,5 +73,12 @@ class Saldo : BaseModel() {
 
       mp.produto?.recalculaSaldo()
     }
+  }
+
+  @PostRemove
+  @PostUpdate
+  @PostPersist
+  fun updateRegistros() {
+    RegistroEndereco.updateRegistros()
   }
 }

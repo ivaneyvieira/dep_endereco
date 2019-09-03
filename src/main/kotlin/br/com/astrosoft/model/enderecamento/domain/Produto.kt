@@ -22,6 +22,9 @@ import javax.persistence.Entity
 import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.persistence.Transient
+import io.ebean.Ebean
+
+
 
 @Entity
 @Table(name = "produtos")
@@ -108,6 +111,10 @@ class Produto : BaseModel() {
   
   fun recalculaSaldo() {
     scriptSql("/sql/recalculaSaldo.sql".readFile(), Pair("idProduto", id))
+    val inserts = true;
+    val updates = true
+    val deletes = false
+    Ebean.externalModification("saldos", inserts, updates, deletes);
   }
   
   val transferencias: List<Transferencia>

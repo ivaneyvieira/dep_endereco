@@ -60,58 +60,8 @@ class Endereco : BaseModel() {
   }
 
   val nivel @Transient get() = apto?.nivel
-  /*
-    fun transferePara(target: Endereco) {
-      val origem: Endereco = this
-      origem.update()
-      target.update()
-      origem.saldos.orEmpty().forEach { saldo ->
-        if (saldo.saldoConfirmado.toInt() > 0) {
-          saldo.update()
-          val produto = saldo.produto
-          val mpTranferencia = produto?.movProdutoTransferencia
-          if (mpTranferencia != null) {
-            val transferencia = Transferencia().apply {
-              this.movProduto = mpTranferencia
-              this.enderecoE = target
-              this.enderecoS = origem
-              this.quantMov = saldo.saldoConfirmado
-              this.observacao = "Tranferencia Drag and Drop"
-            }
-            transferencia.insert()
-          }
-        }
-      }
-    }
-  */
-  fun enderecoOcupado(): EOcupacao {
-    val saldos = Saldo.where().endereco.equalTo(this).findList()
-    val totalConfirmado = saldos.sumByDouble { it.saldoConfirmado.toDouble() }
-    val totalNConfirmado = saldos.sumByDouble { it.saldoNConfirmado.toDouble() }
-    val total = totalConfirmado + totalNConfirmado
-    return if (tipoNivel == PICKING)
-      if (totalConfirmado != 0.00 || totalNConfirmado != 0.00)
-        OCUPADO
-      else NAO_OCUPADO
-    else
-      when {
-        totalConfirmado > 0 -> when {
-          total > 0 -> OCUPADO
-          total < 0 -> ERRO
-          else      -> CINZA
-        }
-        totalConfirmado < 0 -> when {
-          total > 0 -> CINZA
-          total < 0 -> ERRO
-          else      -> CINZA
-        }
-        else                -> when {
-          total > 0 -> CINZA
-          total < 0 -> ERRO
-          else      -> NAO_OCUPADO
-        }
-      }
-  }
+
+
 
   @Formula(select = "(CASE tipo_endereco\n" +
                     "         WHEN 'DEPOSITO' THEN CONCAT(tipo_nivel, ' ', localizacao)\n" +
@@ -184,6 +134,3 @@ enum class ETipoEndereco(private val descricao: String) {
   }
 }
 
-enum class EOcupacao {
-  NAO_OCUPADO, OCUPADO, CINZA, ERRO
-}

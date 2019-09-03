@@ -4,6 +4,7 @@ import br.com.astrosoft.model.enderecamento.domain.EOcupacao.NAO_OCUPADO
 import br.com.astrosoft.model.enderecamento.domain.EPalet.P
 import br.com.astrosoft.model.enderecamento.domain.finder.AptoFinder
 import br.com.astrosoft.model.framework.services.BaseModel
+import br.com.astrosoft.model.framework.services.findById
 import io.ebean.annotation.Index
 import io.ebean.annotation.Length
 import javax.persistence.CascadeType.MERGE
@@ -19,7 +20,7 @@ import javax.persistence.Table
 @Entity
 @Table(name = "aptos")
 @Index(unique = true, columnNames = ["nivel_id", "numero"])
-class Apto : BaseModel() {
+class Apto: BaseModel() {
   @Length(2)
   var numero: String = ""
   @Enumerated(EnumType.STRING)
@@ -33,7 +34,7 @@ class Apto : BaseModel() {
   val ocupacao
     get() = endereco?.enderecoOcupado() ?: NAO_OCUPADO
 
-  companion object Find : AptoFinder()
+  companion object Find: AptoFinder()
 }
 
 enum class EPalet(val descricao: String, val sigla: String, val tamanho: Int) {
@@ -47,7 +48,13 @@ enum class EPalet(val descricao: String, val sigla: String, val tamanho: Int) {
   }
 }
 
-data class EnderecoClassificado(val endereco: Endereco, val nota: Int)
+data class EnderecoClassificado(val apto: RegistroApto, val nota: Int) {
+  val endereco
+    get() : Endereco? {
+      val endereco_id = apto.endereco_id ?: return null
+      return Endereco.findById(endereco_id)
+    }
+}
 
 enum class ETipoAltura(val altMinima: Double, val altMaxima: Double) {
   ALTA(180.01, 300.00),
@@ -55,16 +62,16 @@ enum class ETipoAltura(val altMinima: Double, val altMaxima: Double) {
   BAIXA(0.00, 135.00);
 
   companion object {
-    fun alturasCompativeis(altura: ETipoAltura) = when (altura) {
+    fun alturasCompativeis(altura: ETipoAltura) = when(altura) {
       ALTA  -> listOf(ALTA)
       MEDIA -> listOf(MEDIA, ALTA)
       BAIXA -> listOf(BAIXA, MEDIA, ALTA)
     }
 
     fun classificaAltura(altura: Double): ETipoAltura {
-      return if (altura > BAIXA.altMinima && altura < BAIXA.altMaxima)
+      return if(altura > BAIXA.altMinima && altura < BAIXA.altMaxima)
         BAIXA
-      else if (altura > MEDIA.altMinima && altura < MEDIA.altMaxima)
+      else if(altura > MEDIA.altMinima && altura < MEDIA.altMaxima)
         MEDIA
       else ALTA
     }

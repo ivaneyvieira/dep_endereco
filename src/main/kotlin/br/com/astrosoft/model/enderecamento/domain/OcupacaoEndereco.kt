@@ -37,35 +37,40 @@ class OcupacaoEndereco {
   @Enumerated(EnumType.STRING)
   var lado: ELado = ELado.IMPAR
 
-  companion object Find : OcupacaoEnderecoFinder() {
+  companion object Find: OcupacaoEnderecoFinder() {
     fun enderecosDisponiveis(palet: EPalet, altura: ETipoAltura, ruas: List<Rua>, lado: ELado?): List<Endereco> {
-      val lados = if (lado == null) ELado.values().toList() else listOf(lado)
-      val idRuas = if (ruas.isEmpty())
-        Rua.ruasPulmao.map { r -> r.id }
+      val lados = if(lado == null) ELado.values().toList() else listOf(lado)
+      val idRuas = if(ruas.isEmpty())
+        Rua.ruasPulmao.map {r -> r.id}
       else
-        ruas.map { r -> r.id }
+        ruas.map {r -> r.id}
       val alturasCompativeis = ETipoAltura.alturasCompativeis(altura)
-      val niveis = OcupacaoEndereco
-        .where()
+      val niveis = RegistroEndereco.niveisCompativeis(alturasCompativeis, lados, idRuas)
+      return niveis.mapNotNull {nivel ->
+        return@mapNotNull enderecoLivre(nivel, palet)
+      }
+        .sortedWith(compareBy({-it.nota}, {it.endereco?.localizacao}))
+        .mapNotNull {it.endereco}
+    }
+
+    private fun niveisCompativeis(alturasCompativeis: List<ETipoAltura>, lados: List<ELado>,
+                                  idRuas: List<Long>): List<Nivel> {
+      val niveis = where()
         .tipoAltura.isIn(alturasCompativeis)
         .lado.isIn(lados)
         .rua.id.isIn(idRuas)
         .findList()
-        .mapNotNull { it.nivel }
+        .mapNotNull {it.nivel}
         .distinct()
-      return niveis.mapNotNull { nivel ->
-        val layout = nivel.layout
-        return@mapNotNull enderecoLivre(layout, palet)
-      }.sortedWith(compareBy({ - it.nota }, { it.endereco.localizacao }))
-        .map { it.endereco }
+      return niveis
     }
 
-    fun enderecoLivre(layout: LayoutNivel?, palet: EPalet?): EnderecoClassificado? {
-      layout ?: return null
+    fun enderecoLivre(nivel: RegistroNivel, palet: EPalet?): EnderecoClassificado? {
       palet ?: return null
-      val total = layout.total
+      nivel.layout ?: return null
+      val total = nivel.total ?: 0
       val resto = 30 - total
-      val enderecoLivre = layout.primeiroEnderecoLivre() ?: return null
+      val enderecoLivre = nivel.primeiroEnderecoLivre() ?: return null
       val restoFinal = resto - palet.tamanho
 
       return when {
@@ -73,7 +78,7 @@ class OcupacaoEndereco {
         restoFinal == 5  -> null
         restoFinal == 0  -> EnderecoClassificado(enderecoLivre, 3)
         restoFinal == 10 ->
-          if (palet == T && layout.layout == "_P_")
+          if(palet == T && nivel.layout == "_P_")
             null
           else
             EnderecoClassificado(enderecoLivre, 2)

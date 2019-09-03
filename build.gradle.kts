@@ -84,14 +84,12 @@ dependencies {
   compile ("org.imgscalr:imgscalr-lib:4.2")
 
   //Dependências do ebean
-  //kapt "io.ebean:kotlin-querybean-generator:11.1.2")
-  compile ("io.ebean:ebean:11.28.3")
-//  compile ("io.ebean:kotlin-querybean-generator:11.19.1")
-  compile ("io.ebean:querybean-generator:11.24.1")
-  compile ("io.ebean:ebean-querybean:11.24.1")
-  compile ("io.ebean:ebean-annotation:4.3")
-  compile ("io.ebean.tools:finder-generator:4.2.2")
-  //compile ("io.ebean:ebean-docker-run:1.5.1")
+  compile("io.ebean:ebean:11.41.1")
+  // compile "io.ebean:querybean-generator:11.37.1"
+  compile("io.ebean:ebean-querybean:11.40.1")
+  implementation("io.ebean:ebean-agent:11.41.1")
+  //compile "io.ebean:ebean-anebean-agent notation:4.7"
+  compile("io.ebean.tools:finder-generator:11.34.1")
 
 //  compile ("com.mchange:c3p0:0.9.5.2")
 //  compile ("net.sf.ehcache:ehcache:2.10.4")
