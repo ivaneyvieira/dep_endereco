@@ -20,8 +20,6 @@ data class RegistroEndereco(
   val nivel: String,
   val altura: BigDecimal,
   val tipo_nivel: String,
-  val layout: String?,
-  val total: Int?,
   val apto_id: Long,
   val apto: String,
   val tipo_palet: String,
@@ -33,13 +31,24 @@ data class RegistroEndereco(
   val saldo_confirmado: BigDecimal,
   val saldo_nconfirmado: BigDecimal
                            ) {
+  val layoutNivel = RegistroEndereco.findLayout(nivel_id)
+  val layout: String? = layoutNivel?.layout
+  val total: Int? = layoutNivel?.total
+
   companion object {
     val enderecos = mutableListOf<RegistroEndereco>()
+    val layouts = mutableListOf<LayoutNivel>()
 
     fun updateRegistros() {
       val sql = "/sql/registroEndereco.sql".readFile()
+      layouts.clear()
+      layouts.addAll(LayoutNivel.all())
       enderecos.clear()
       enderecos.addAll(Ebean.findDto(RegistroEndereco::class.java, sql).findList())
+    }
+
+    fun findLayout(nivelId: Long): LayoutNivel? {
+      return layouts.firstOrNull {it.nivel?.id == nivelId}
     }
 
     fun niveisCompativeis(alturasCompativeis: List<ETipoAltura>, lados: List<ELado>,

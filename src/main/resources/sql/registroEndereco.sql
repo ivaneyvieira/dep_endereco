@@ -7,8 +7,6 @@ SELECT R.id                           AS rua_id,
        N.numero                       AS nivel,
        N.altura,
        N.tipo_nivel,
-       L.layout,
-       L.total,
        A.id                           AS apto_id,
        A.numero                       AS apto,
        A.tipo_palet,
@@ -28,8 +26,6 @@ FROM ruas                                  AS R
                     ON N.id = A.nivel_id
          LEFT JOIN  enderecos              AS E
                     ON A.endereco_id = E.id
-         LEFT JOIN  layout_niveis          AS L
-                    ON L.nivel_id = N.id
          LEFT JOIN  (SELECT endereco_id,
                             SUM(saldo_confirmado)  AS saldo_confirmado,
                             SUM(saldo_nconfirmado) AS saldo_nconfirmado
