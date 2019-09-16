@@ -89,6 +89,7 @@ abstract class GridField<BEAN : Any>(
   open fun updateView() {
     if (grid.editor.isOpen)
       grid.editor.cancel()
+    model.updateList()
     setValue(model.list.orEmpty())
     model.itemSelected?.let {
       grid.select(it)

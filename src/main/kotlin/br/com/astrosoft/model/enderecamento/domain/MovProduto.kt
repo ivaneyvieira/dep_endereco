@@ -66,6 +66,8 @@ HAVING M.quant_mov > IFNULL(SUM(T.quant_mov), 0)"""
     }
   }
 
+  fun transferencias() = Transferencia.where().movProduto.equalTo(this).findList()
+
   @get:Transient
   val tipoMov: EMovTipo?
     get() {
@@ -89,9 +91,11 @@ HAVING M.quant_mov > IFNULL(SUM(T.quant_mov), 0)"""
   fun processaEnderecamento(
     palet: EPalet,
     altura: ETipoAltura,
-    ruas: List<Rua>,
+    ruas: List<RepositorioRua>,
     lado: ELado?
                            ) {
+    deleteTransferencias()
+    produto?.recalculaSaldo()
     val totalConfirmado = transferencias.orEmpty()
       .filter { t -> t.confirmacao }
       .map { t -> t.quantMov.toDouble() }.sum()
@@ -99,13 +103,17 @@ HAVING M.quant_mov > IFNULL(SUM(T.quant_mov), 0)"""
     //Enderecos livres
     val disponiveis = OcupacaoEndereco.enderecosDisponiveis(palet, altura, ruas, lado)
     //Estou criando uma lista onde os enderecos provaives apacrecem na frente dos endereços disponíveis
+    val endS = Endereco.recebimento()
     if (quantMov <= quantPalete.toDouble() * disponiveis.size) {
-      deleteTransferencias()
-      val endS = Endereco.recebimento()
       var quant = quantMov
       var index = 0
       while (quant > 0) {
         val endE = disponiveis[index++]
+        endE.apto?.let { apto ->
+          apto.tipoPalet = palet
+          apto.tipoAltura = altura
+          apto.save()
+        }
         val quantEnd = if (quant > quantPalete.toDouble())
           quantPalete.toDouble()
         else
@@ -121,11 +129,6 @@ HAVING M.quant_mov > IFNULL(SUM(T.quant_mov), 0)"""
         }
 
         movimentacao.save()
-        movimentacao.enderecoE?.apto?.let { apto ->
-          apto.tipoPalet = palet
-          apto.tipoAltura = altura
-          apto.save()
-        }
       }
 
       produto?.recalculaSaldo()
@@ -133,8 +136,7 @@ HAVING M.quant_mov > IFNULL(SUM(T.quant_mov), 0)"""
   }
 
   private fun deleteTransferencias() {
-    refresh()
-    transferencias.orEmpty().forEach { it.delete() }
+    transferencias().forEach { it.delete() }
   }
 
   @get:Transient

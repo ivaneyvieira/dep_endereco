@@ -74,11 +74,4 @@ class Saldo : BaseModel() {
       mp.produto?.recalculaSaldo()
     }
   }
-
-  @PostRemove
-  @PostUpdate
-  @PostPersist
-  fun updateRegistros() {
-    RegistroEndereco.updateRegistros()
-  }
 }

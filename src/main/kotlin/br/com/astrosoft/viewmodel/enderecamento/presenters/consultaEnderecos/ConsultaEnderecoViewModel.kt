@@ -5,6 +5,7 @@ import br.com.astrosoft.model.enderecamento.domain.ELado
 import br.com.astrosoft.model.enderecamento.domain.ETipoNivel
 import br.com.astrosoft.model.enderecamento.domain.Nivel
 import br.com.astrosoft.model.enderecamento.domain.Predio
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.model.framework.services.findAll
 import br.com.astrosoft.viewmodel.framework.viewmodel.ViewModel
@@ -18,7 +19,11 @@ class ConsultaEnderecoViewModel : ViewModel() {
   var lado: ELado? = null
   var tipoNivel: ETipoNivel? = null
   val grid = GridConsultaEndereco(this)
-  
+
+  init {
+    RepositorioEndereco.updateRegistros()
+  }
+
   override fun reloadModel() {
     grid.processaGrid()
   }

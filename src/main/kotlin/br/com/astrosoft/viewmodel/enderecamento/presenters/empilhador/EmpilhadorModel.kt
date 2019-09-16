@@ -1,13 +1,18 @@
 package br.com.astrosoft.viewmodel.enderecamento.presenters.empilhador
 
 import br.com.astrosoft.model.enderecamento.domain.OrdemServico
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.model.enderecamento.domain.User
 import br.com.astrosoft.viewmodel.framework.viewmodel.ViewModel
 
 class EmpilhadorModel : ViewModel() {
   val empilhadorHeaderModel = EmpilhadorHeaderModel()
   val empilhadorGridModel = EmpilhadorGridModel()
-  
+
+  init {
+    RepositorioEndereco.updateRegistros()
+  }
+
   override fun reloadModel() {
     updateGrid()
   }

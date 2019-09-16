@@ -105,13 +105,6 @@ class Transferencia : BaseModel() {
       }
     }
   }
-
-  @PostRemove
-  @PostUpdate
-  @PostPersist
-  fun updateRegistros() {
-    RegistroEndereco.updateRegistros()
-  }
 }
 
 enum class ESimNao(private val descricao: String) {

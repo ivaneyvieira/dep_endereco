@@ -2,6 +2,7 @@ package br.com.astrosoft.viewmodel.enderecamento.presenters.pickingProdutos
 
 import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.enderecamento.domain.Produto
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.model.enderecamento.domain.Saldo
 import br.com.astrosoft.model.framework.exceptions.ViewException
 import br.com.astrosoft.viewmodel.framework.viewmodel.IListModel
@@ -15,6 +16,10 @@ class ListSaldoModel(val model: PickingViewModel) : IListModel<Saldo>() {
   
   override fun updateList() {
     list = model.produto?.saldosPulmao?.sortedBy { it.ultEntrada }
+  }
+
+  fun updateEnderecos(){
+    RepositorioEndereco.updateRegistros()
   }
   
   fun savePicking() = model.exec {

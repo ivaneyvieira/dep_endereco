@@ -1,12 +1,17 @@
 package br.com.astrosoft.viewmodel.enderecamento.presenters.ordemServico
 
 import br.com.astrosoft.model.enderecamento.domain.OrdemServico
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.viewmodel.framework.viewmodel.ViewModel
 
 class OrdemServicoViewModel : ViewModel() {
   
   val headerModel = HeaderModel(this)
   val gridModel = GridModel(this)
+
+  init {
+    RepositorioEndereco.updateRegistros()
+  }
   
   override fun reloadModel() {
     gridModel.updateList()

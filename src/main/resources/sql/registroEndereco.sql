@@ -14,9 +14,7 @@ SELECT R.id                           AS rua_id,
        E.id                           AS endereco_id,
        E.tipo_endereco,
        E.observacao,
-       E.localizacao,
-       IFNULL(S.saldo_confirmado, 0)  AS saldo_confirmado,
-       IFNULL(S.saldo_nconfirmado, 0) AS saldo_nconfirmado
+       E.localizacao
 FROM ruas                                  AS R
          INNER JOIN predios                AS P
                     ON R.id = P.rua_id
@@ -26,9 +24,3 @@ FROM ruas                                  AS R
                     ON N.id = A.nivel_id
          LEFT JOIN  enderecos              AS E
                     ON A.endereco_id = E.id
-         LEFT JOIN  (SELECT endereco_id,
-                            SUM(saldo_confirmado)  AS saldo_confirmado,
-                            SUM(saldo_nconfirmado) AS saldo_nconfirmado
-                     FROM saldos
-                     GROUP BY endereco_id) AS S
-                    USING (endereco_id)

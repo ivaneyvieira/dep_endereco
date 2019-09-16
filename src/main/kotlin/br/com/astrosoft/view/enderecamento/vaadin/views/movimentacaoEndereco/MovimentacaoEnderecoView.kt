@@ -62,6 +62,7 @@ class MovimentacaoEnderecoView : FormView<MovimentacaoEnderecoViewModel>(
         addComponentsAndExpand(origemField, destinoField)
         button("Transferencia") {
           addListener {
+            model.updateEnderecos()
             model.processaTranferencia()
           }
           alignment = Alignment.BOTTOM_RIGHT

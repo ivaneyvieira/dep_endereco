@@ -1,6 +1,6 @@
 package br.com.astrosoft.view.enderecamento.vaadin
 
-import br.com.astrosoft.model.enderecamento.domain.RegistroEndereco
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.view.framework.vaadin.ViewVaadinServlet
 import com.vaadin.annotations.VaadinServletConfiguration
 import javax.servlet.ServletContextEvent
@@ -32,6 +32,6 @@ class Bootstrap : ServletContextListener {
     val home = System.getenv("HOME")
     val fileName = System.getenv("EBEAN_PROPS") ?: "$home/ebean.dep.properties"
     System.setProperty("ebean.props.file", fileName)
-    RegistroEndereco.updateRegistros()
+    RepositorioEndereco.updateRegistros()
   }
 }

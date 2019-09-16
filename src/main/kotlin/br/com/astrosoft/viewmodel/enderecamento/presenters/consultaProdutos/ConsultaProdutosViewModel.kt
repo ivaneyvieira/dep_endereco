@@ -1,12 +1,17 @@
 package br.com.astrosoft.viewmodel.enderecamento.presenters.consultaProdutos
 
 import br.com.astrosoft.model.enderecamento.domain.Produto
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.viewmodel.framework.viewmodel.ViewModel
 
 class ConsultaProdutosViewModel : ViewModel() {
   var produtos: List<Produto>? = null
   val gridProdutos = GridProdutosModel(this)
-  
+
+  init {
+    RepositorioEndereco.updateRegistros()
+  }
+
   override fun reloadModel() {
     gridProdutos.updateList()
   }

@@ -46,13 +46,18 @@ enum class EPalet(val descricao: String, val sigla: String, val tamanho: Int) {
   override fun toString(): String {
     return this.descricao
   }
+
+  companion object {
+    fun value(str: String) = values().firstOrNull {it.name == str} ?: P
+  }
 }
 
-data class EnderecoClassificado(val apto: RegistroApto, val nota: Int) {
-  val endereco
-    get() : Endereco? {
-      val endereco_id = apto.endereco_id ?: return null
-      return Endereco.findById(endereco_id)
+data class EnderecoClassificado(val nivel: RepositorioNivel, val aptos: List<RepositorioApto?>, val nota: String) {
+  val classificacao = "$nota:${nivel.localizacao}"
+  val enderecos
+    get() : List<Endereco> = aptos.mapNotNull{ apto->
+      val endereco_id = apto?.endereco_id ?: return@mapNotNull null
+      Endereco.findById(endereco_id)
     }
 }
 
@@ -67,6 +72,8 @@ enum class ETipoAltura(val altMinima: Double, val altMaxima: Double) {
       MEDIA -> listOf(MEDIA, ALTA)
       BAIXA -> listOf(BAIXA, MEDIA, ALTA)
     }
+
+    fun value(str: String) = values().firstOrNull {it.name == str} ?: BAIXA
 
     fun classificaAltura(altura: Double): ETipoAltura {
       return if(altura > BAIXA.altMinima && altura < BAIXA.altMaxima)

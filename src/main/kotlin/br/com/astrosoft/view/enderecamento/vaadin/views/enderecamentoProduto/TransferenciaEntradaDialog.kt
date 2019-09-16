@@ -8,7 +8,7 @@ import com.vaadin.ui.VerticalLayout
 class TransferenciaEntradaDialog(val model: TransferenciaEntradaModel) : DialogModal("Endereçamento") {
   
   private val transferenciaEntradaGrid: TransferenciaEntradaGrid = TransferenciaEntradaGrid(model.grid)
-  private val transferenciaEntradaHeader: TransferenciaEntradaHeader = TransferenciaEntradaHeader(model.header)
+  private val transferenciaEntradaHeader: TransferenciaEntradaHeader = TransferenciaEntradaHeader(model.header, transferenciaEntradaGrid)
   
   override fun buildForm(): VerticalLayout {
     val layout = VerticalLayout(this.transferenciaEntradaHeader)
