@@ -25,6 +25,7 @@ class GridPickingSaldo(private val modelSaldo: ListSaldoModel) :
       endereco = bean.endereco
       quantidade = bean.quantidade
       itemSelected = bean.saldo
+      updateEnderecos()
       savePicking()
     }
   }

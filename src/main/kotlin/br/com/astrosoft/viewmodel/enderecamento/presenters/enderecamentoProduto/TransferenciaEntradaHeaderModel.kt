@@ -8,24 +8,26 @@ import br.com.astrosoft.model.enderecamento.domain.ETipoAltura
 import br.com.astrosoft.model.enderecamento.domain.ETipoAltura.BAIXA
 import br.com.astrosoft.model.enderecamento.domain.MovProduto
 import br.com.astrosoft.model.enderecamento.domain.Produto
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
+import br.com.astrosoft.model.enderecamento.domain.RepositorioRua
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.model.enderecamento.domain.Saldo
 import br.com.astrosoft.model.framework.exceptions.ViewException
 import br.com.astrosoft.viewmodel.framework.viewmodel.IListModel
 import java.math.BigDecimal
 
-class TransferenciaEntradaHeaderModel(val model: EnderecamentoProdutoViewModel) : IListModel<Saldo>() {
+class TransferenciaEntradaHeaderModel(val model: EnderecamentoProdutoViewModel): IListModel<Saldo>() {
   var movProduto: MovProduto? = null
   var produto: Produto? = null
   var comboPalete: EPalet = P
   var comboAltura: ETipoAltura = BAIXA
-  val tokenRuas: MutableList<Rua> = mutableListOf()
+  val tokenRuas: MutableList<RepositorioRua> = mutableListOf()
   var lado: ELado? = IMPAR
   override var list: List<Saldo>? = null
   private var codigo: String = ""
   var descricao: String = ""
   var quantPalete: BigDecimal = BigDecimal.ZERO
-  var ruasPulmao: List<Rua>? = Rua.ruasPulmao
+  var ruasPulmao: List<RepositorioRua>? = Rua.ruasPulmao
   override var itemSelected: Saldo? = null
 
   fun updateFields() {
@@ -46,11 +48,10 @@ class TransferenciaEntradaHeaderModel(val model: EnderecamentoProdutoViewModel) 
       existemEnderecamentosConfirmados() -> throw ViewException("Existem endereçamentos confirmados")
       else                               -> {
         val produtosRecebidosModel = model.produtosRecebidosModel
-        movProduto?.let { mp ->
+        movProduto?.let {mp ->
           mp.quantPalete = quantPalete
           mp.save()
           mp.processaEnderecamento(comboPalete, comboAltura, tokenRuas, lado)
-
           produtosRecebidosModel.updateList()
           produtosRecebidosModel.transferenciaEntradaModel.grid.updateList()
         }
@@ -59,10 +60,17 @@ class TransferenciaEntradaHeaderModel(val model: EnderecamentoProdutoViewModel) 
   }
 
   private fun existemEnderecamentosConfirmados(): Boolean {
-    return model.produtosRecebidosModel.transferenciaEntradaModel.grid.list.orEmpty().any { it.confirmacao }
+    return model.produtosRecebidosModel.transferenciaEntradaModel.grid.list.orEmpty()
+      .any {it.confirmacao}
   }
 
   override fun updateList() {
     list = produto?.saldosPulmao.orEmpty()
+  }
+
+  fun removeTransferencia() = model.exec {
+    movProduto?.transferencias()
+      ?.forEach {it.delete()}
+    RepositorioEndereco.updateRegistros()
   }
 }

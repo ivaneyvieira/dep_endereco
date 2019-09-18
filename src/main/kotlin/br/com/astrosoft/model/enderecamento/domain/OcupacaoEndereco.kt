@@ -1,6 +1,9 @@
 package br.com.astrosoft.model.enderecamento.domain
 
+import br.com.astrosoft.model.enderecamento.domain.EPalet.G
+import br.com.astrosoft.model.enderecamento.domain.EPalet.P
 import br.com.astrosoft.model.enderecamento.domain.EPalet.T
+import br.com.astrosoft.model.enderecamento.domain.EPalet.X
 import br.com.astrosoft.model.enderecamento.domain.finder.OcupacaoEnderecoFinder
 import io.ebean.annotation.View
 import javax.persistence.Column
@@ -38,19 +41,20 @@ class OcupacaoEndereco {
   var lado: ELado = ELado.IMPAR
 
   companion object Find: OcupacaoEnderecoFinder() {
-    fun enderecosDisponiveis(palet: EPalet, altura: ETipoAltura, ruas: List<Rua>, lado: ELado?): List<Endereco> {
+    fun enderecosDisponiveis(palet: EPalet, altura: ETipoAltura, ruas: List<RepositorioRua>, lado: ELado?):
+      List<Endereco> {
       val lados = if(lado == null) ELado.values().toList() else listOf(lado)
       val idRuas = if(ruas.isEmpty())
-        Rua.ruasPulmao.map {r -> r.id}
+        Rua.ruasPulmao.map {r -> r.rua_id}
       else
-        ruas.map {r -> r.id}
+        ruas.map {r -> r.rua_id}
       val alturasCompativeis = ETipoAltura.alturasCompativeis(altura)
-      val niveis = RegistroEndereco.niveisCompativeis(alturasCompativeis, lados, idRuas)
+      val niveis = RepositorioEndereco.niveisCompativeis(alturasCompativeis, lados, idRuas)
       return niveis.mapNotNull {nivel ->
         return@mapNotNull enderecoLivre(nivel, palet)
       }
-        .sortedWith(compareBy({-it.nota}, {it.endereco?.localizacao}))
-        .mapNotNull {it.endereco}
+        .sortedBy {it.classificacao}
+        .flatMap { it.enderecos }
     }
 
     private fun niveisCompativeis(alturasCompativeis: List<ETipoAltura>, lados: List<ELado>,
@@ -65,26 +69,44 @@ class OcupacaoEndereco {
       return niveis
     }
 
-    fun enderecoLivre(nivel: RegistroNivel, palet: EPalet?): EnderecoClassificado? {
+    fun enderecoLivre(nivel: RepositorioNivel, palet: EPalet?): EnderecoClassificado? {
       palet ?: return null
-      nivel.layout ?: return null
-      val total = nivel.total ?: 0
-      val resto = 30 - total
-      val enderecoLivre = nivel.primeiroEnderecoLivre() ?: return null
-      val restoFinal = resto - palet.tamanho
+      val layout = nivel.layout ?: return null
+      val total = nivel.total ?: return null
+      val enderecosLivre = nivel.enderecosLivre()
+      val enderecoLivre1 = enderecosLivre.getOrNull(0)
+      val enderecoLivre2 = enderecosLivre.getOrNull(1)
 
-      return when {
-        restoFinal < 0   -> null
-        restoFinal == 5  -> null
-        restoFinal == 0  -> EnderecoClassificado(enderecoLivre, 3)
-        restoFinal == 10 ->
-          if(palet == T && nivel.layout == "_P_")
-            null
-          else
-            EnderecoClassificado(enderecoLivre, 2)
-        restoFinal == 15 -> EnderecoClassificado(enderecoLivre, 4)
-        restoFinal == 20 -> EnderecoClassificado(enderecoLivre, 1)
-        else             -> null
+      return when(total) {
+        0 -> {
+          when(palet) {
+            P    -> EnderecoClassificado(nivel, enderecosLivre, "02")
+            G    -> EnderecoClassificado(nivel, listOf(enderecoLivre1, enderecoLivre2), "02")
+            T    -> EnderecoClassificado(nivel, listOf(enderecoLivre1), "03")
+            X    -> EnderecoClassificado(nivel, listOf(enderecoLivre1), "01")
+            else -> null
+          }
+        }
+        10 -> {
+          when(palet) {
+            P    -> EnderecoClassificado(nivel, listOf(enderecoLivre1, enderecoLivre2), "02")
+            T    -> EnderecoClassificado(nivel, listOf(enderecoLivre1), "01")
+            else -> null
+          }
+        }
+        15 -> {
+          when(palet) {
+            G    -> EnderecoClassificado(nivel, listOf(enderecoLivre1), "01")
+            else -> null
+          }
+        }
+        20 -> {
+          when(palet) {
+            P    -> EnderecoClassificado(nivel, listOf(enderecoLivre1), "01")
+            else -> null
+          }
+        }
+        else -> null
       }
     }
   }

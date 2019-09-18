@@ -1,6 +1,7 @@
 package br.com.astrosoft.viewmodel.enderecamento.presenters.pickingProdutos
 
 import br.com.astrosoft.model.enderecamento.domain.Produto
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.model.enderecamento.domain.Saldo
 import br.com.astrosoft.model.framework.services.findById
 import br.com.astrosoft.viewmodel.framework.viewmodel.ViewModel
@@ -9,6 +10,10 @@ class PickingViewModel : ViewModel() {
   var produto: Produto? = null
   val listSaldo = ListSaldoModel(this)
   val listTransferencia = ListTransferenciaModel(this)
+
+  init {
+    RepositorioEndereco.updateRegistros()
+  }
   
   override fun reloadModel() {
     listSaldo.updateList()

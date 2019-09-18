@@ -5,6 +5,7 @@ import br.com.astrosoft.model.enderecamento.domain.EOcupacao.CINZA
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.ERRO
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.NAO_OCUPADO
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.OCUPADO
+import br.com.astrosoft.model.enderecamento.domain.RepositorioApto
 import br.com.astrosoft.view.enderecamento.vaadin.Styles
 import br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito.LayoutLado
 import br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito.MapaNiveisAptosModel
@@ -14,7 +15,7 @@ import com.vaadin.ui.Image
 import com.vaadin.ui.Panel
 import com.vaadin.ui.themes.ValoTheme
 
-class PanelApto(val apto: Apto, private val lado: LayoutLado, private val model: MapaNiveisAptosModel) :
+class PanelApto(val apto: RepositorioApto, private val lado: LayoutLado, private val model: MapaNiveisAptosModel) :
         Panel() {
   private val dialogEndereco: DialogEndereco = DialogEndereco(model.mapaEnderecoModel)
   
@@ -30,7 +31,7 @@ class PanelApto(val apto: Apto, private val lado: LayoutLado, private val model:
     imageLivre.setSizeFull()
     addStyleName(Styles.hand_select)
     addStyleName(ValoTheme.PANEL_BORDERLESS)
-    when (apto.ocupacao){
+    when (apto.enderecoOcupado()){
       NAO_OCUPADO -> aptoDesocupado()
       OCUPADO     -> aptoOcupado("")
       CINZA       -> aptoOcupado(Styles.cinza)
@@ -39,8 +40,8 @@ class PanelApto(val apto: Apto, private val lado: LayoutLado, private val model:
 
     setSizeFull()
     addClickListener {
-      model.mapaEnderecoModel.endereco = apto.endereco
-      apto.endereco?.let { showDiagloApartamento() }
+      val endereco = model.mapaEnderecoModel.updateEnderco(apto.endereco_id)
+      endereco?.let { showDiagloApartamento() }
     }
   }
   
@@ -53,8 +54,6 @@ class PanelApto(val apto: Apto, private val lado: LayoutLado, private val model:
   }
   
   private fun aptoDesocupado() {
-    // removeStyleName(Styles.apto_ocupado);
-    // addStyleName(Styles.apto_vazio);
     content = imageLivre
   }
   
@@ -67,13 +66,11 @@ class PanelApto(val apto: Apto, private val lado: LayoutLado, private val model:
   }
 
   fun unMark() {
-    //    removeStyleName(Styles.box_mark)
     imageLivre.removeStyleName(Styles.img_select)
     imageOcupado.removeStyleName(Styles.img_select)
   }
   
   fun mark() {
-    //  addStyleName(Styles.box_mark)
     imageLivre.addStyleName(Styles.img_select)
     imageOcupado.addStyleName(Styles.img_select)
   }

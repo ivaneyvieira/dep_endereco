@@ -1,5 +1,6 @@
 package br.com.astrosoft.view.enderecamento.vaadin.views.mapaDeposito
 
+import br.com.astrosoft.model.enderecamento.domain.RepositorioRua
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito.LayoutLado
 import br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito.LayoutRuaPredio
@@ -38,7 +39,12 @@ class MapaRuasPredios(private val model: MapaRuasPrediosModel): CssLayout() {
     }
   }
 
+<<<<<<< HEAD
   private fun configLayout(layout: GridLayout, layoutRuaPredios: LayoutRuaPredio?, rua: Rua, coluna: MutableInt) {
+=======
+  private fun configLayout(layout: GridLayout, layoutRuaPredios: LayoutRuaPredio?, rua: RepositorioRua,
+                           coluna: MutableInt) {
+>>>>>>> 27ad73c0d3590160f701d5aa4e35586f96bc2592
     val ladoImpar = layoutRuaPredios?.getLadoImpar(rua)
     val ladoPar = layoutRuaPredios?.getLadoPar(rua)
     configLayoutPredios(layout, ladoImpar, coluna)
@@ -57,14 +63,22 @@ class MapaRuasPredios(private val model: MapaRuasPrediosModel): CssLayout() {
 
         layout.addComponent(layoutPredio, col, linha)
 
+<<<<<<< HEAD
         this.mapPredio[predio.id] = layoutPredio
+=======
+        this.mapPredio[predio.predio_id] = layoutPredio
+>>>>>>> 27ad73c0d3590160f701d5aa4e35586f96bc2592
         row.add(-1)
       }
       coluna.add(1)
     }
   }
 
+<<<<<<< HEAD
   private fun configLayoutRua(layout: GridLayout, rua: Rua, coluna: MutableInt) {
+=======
+  private fun configLayoutRua(layout: GridLayout, rua: RepositorioRua, coluna: MutableInt) {
+>>>>>>> 27ad73c0d3590160f701d5aa4e35586f96bc2592
     val layoutLado = PanelRua(rua)
     val fim = layout.rows - 1
     val col = coluna.value
@@ -102,6 +116,9 @@ class MapaRuasPredios(private val model: MapaRuasPrediosModel): CssLayout() {
   }
 
   fun updateModel() {
+<<<<<<< HEAD
     //Vazio
+=======
+>>>>>>> 27ad73c0d3590160f701d5aa4e35586f96bc2592
   }
 }

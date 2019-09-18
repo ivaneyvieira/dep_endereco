@@ -4,55 +4,76 @@ import br.com.astrosoft.model.enderecamento.domain.ELado
 import br.com.astrosoft.model.enderecamento.domain.ELado.IMPAR
 import br.com.astrosoft.model.enderecamento.domain.ELado.PAR
 import br.com.astrosoft.model.enderecamento.domain.Predio
+import br.com.astrosoft.model.enderecamento.domain.RepositorioPredio
+import br.com.astrosoft.model.enderecamento.domain.RepositorioRua
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.model.enderecamento.dtos.RuaPredio
 
 class LayoutRuaPredio(private val model: MapaDepositoViewModel) {
   private val ruaPredios: List<RuaPredio> = model.findRuasPredio()
   val largura: Int?
-    get() = ruaPredios.map(RuaPredio::rua).distinct().map { r -> getLargura(r) }.sum()
-  
-  private fun getLargura(rua: Rua): Int {
-    val countLado = ruaPredios.filter { rp -> rp.rua == rua }.map { rp -> rp.predio.lado }.distinct().count()
+    get() = ruaPredios.map(RuaPredio::rua).distinct().map {r -> getLargura(r)}.sum()
+
+  private fun getLargura(rua: RepositorioRua): Int {
+    val countLado = ruaPredios.filter {rp -> rp.rua == rua}
+      .map {rp -> rp.predio.lado}
+      .distinct()
+      .count()
     return countLado + 1
   }
-  
+
   val altura: Int?
     get() {
-      val ladoPar = ruaPredios.asSequence().map(RuaPredio::rua).distinct().map {r ->
-        getLado(r, PAR)
-      }.map { l -> l.predios.size }.max() ?: 0
+      val ladoPar = ruaPredios.asSequence()
+                      .map(RuaPredio::rua)
+                      .distinct()
+                      .map {r ->
+                        getLado(r, PAR)
+                      }.map {l -> l.predios.size}
+                      .max() ?: 0
       val ladoImpar = ruaPredios.asSequence()
         .map(RuaPredio::rua)
-        .distinct().map {r ->
-        getLado(r, IMPAR)
-      }.map { l -> l.predios.size }.max()
+        .distinct()
+        .map {r ->
+          getLado(r, IMPAR)
+        }
+        .map {l -> l.predios.size}
+        .max()
       return Math.max(ladoImpar ?: 0, ladoPar)
     }
-  val ruas: List<Rua>
-    get() = ruaPredios.map(RuaPredio::rua).distinct().sortedBy(Rua::numero)
-  
-  fun getLadoImpar(rua: Rua): LayoutLado {
+  val ruas: List<RepositorioRua>
+    get() = ruaPredios.map(RuaPredio::rua).distinct().sortedBy(RepositorioRua::rua)
+
+  fun getLadoImpar(rua: RepositorioRua): LayoutLado {
     return getLado(rua, IMPAR)
   }
-  
-  fun getLadoPar(rua: Rua): LayoutLado {
+
+  fun getLadoPar(rua: RepositorioRua): LayoutLado {
     return getLado(rua, PAR)
   }
-  
-  private fun getLado(rua: Rua, lado: ELado): LayoutLado {
+
+  private fun getLado(rua: RepositorioRua, lado: ELado): LayoutLado {
     val predios =
-            ruaPredios.filter { rp -> rp.rua == rua }.map { rp -> rp.predio }.distinct().filter { p -> p.lado === lado }
+      ruaPredios.filter {rp ->
+        rp.rua.rua_id == rua.rua_id
+      }
+        .map {rp -> rp.predio}
+        .filter {p ->
+          val ladoStr = lado.name
+          p.lado == ladoStr
+        }
+        .distinct()
     return LayoutLado(rua, lado, predios, model)
   }
-  
-  fun getLayoutLado(predio: Predio): LayoutLado? {
-    val lado = predio.lado
+
+  fun getLayoutLado(predio: RepositorioPredio): LayoutLado? {
+    val lado = predio.lado() ?: return null
     val rua = getRua(predio)
     return getLado(rua, lado)
   }
-  
-  private fun getRua(predio: Predio): Rua {
-    return ruaPredios.first { rp -> rp.predio == predio }.rua
+
+  private fun getRua(predio: RepositorioPredio): RepositorioRua {
+    return ruaPredios.first {rp -> rp.predio == predio}
+      .rua
   }
 }

@@ -5,6 +5,7 @@ import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.enderecamento.domain.MovProduto
 import br.com.astrosoft.model.enderecamento.domain.Movimentacao
 import br.com.astrosoft.model.enderecamento.domain.Produto
+import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
 import br.com.astrosoft.model.enderecamento.domain.Transferencia
 import br.com.astrosoft.model.enderecamento.domain.enderecoOcupado
 import br.com.astrosoft.model.framework.exceptions.ViewException
@@ -51,6 +52,10 @@ class MovimentacaoEnderecoViewModel : ViewModel() {
                                                                                                 end))
       }
     }
+  }
+
+  fun updateEnderecos() {
+    RepositorioEndereco.updateRegistros()
   }
 }
 

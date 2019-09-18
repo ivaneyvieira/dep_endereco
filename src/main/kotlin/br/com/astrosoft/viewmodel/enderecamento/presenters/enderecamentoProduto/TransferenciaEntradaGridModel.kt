@@ -47,7 +47,7 @@ class TransferenciaEntradaGridModel(val model: EnderecamentoProdutoViewModel): I
     val movProduto = model.produtosRecebidosModel.transferenciaEntradaModel.header.movProduto
     movProduto?.let {
       it.refresh()
-      list = it.transferencias
+      list = it.transferencias()
     }
     //list = Transferencia.where().movProduto.id.eq(movProduto?.id).findList()
     model.produtosRecebidosModel.updateList()

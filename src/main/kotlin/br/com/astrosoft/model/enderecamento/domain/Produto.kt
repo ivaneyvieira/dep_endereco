@@ -23,13 +23,12 @@ import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.persistence.Transient
 import io.ebean.Ebean
-
-
+import io.ebean.annotation.Transactional
 
 @Entity
 @Table(name = "produtos")
 @Index(unique = true, columnNames = ["prdno", "grade"])
-class Produto : BaseModel() {
+class Produto: BaseModel() {
   @Length(16)
   @Index
   var codbar: String = ""
@@ -52,111 +51,114 @@ class Produto : BaseModel() {
   val saldos: List<Saldo>? = null
   @OneToMany(mappedBy = "produto", cascade = [PERSIST, MERGE, REFRESH])
   val movProdutos: List<MovProduto>? = null
-  
   @get:Transient
   val codigoGrade by cacheValue {
-    prdno.trim { it <= ' ' } + " " + grade
+    prdno.trim {it <= ' '} + " " + grade
   }
-  
-  val saldoSaci by cacheValue { saldoSaci(this) }
-  
+  val saldoSaci by cacheValue {saldoSaci(this)}
+
   override fun toString(): String {
     return codigoGrade ?: ""
   }
-  
-  companion object Find : ProdutoFinder() {
+
+  companion object Find: ProdutoFinder() {
     fun findProduto(
-            prdno: String, grade: String?
+      prdno: String, grade: String?
                    ): Produto? {
-      return where().prdno.eq(prdno).and().grade.eq(grade).findOne()
+      return where().prdno.eq(prdno)
+        .and()
+        .grade.eq(grade)
+        .findOne()
     }
-    
+
     fun findProdutoQuery(query: String): List<Produto> {
-      if (query.trim().length <= 6) {
-        val prdNorm = query.trim().lpad(6, "0")
+      if(query.trim().length <= 6) {
+        val prdNorm = query.trim()
+          .lpad(6, "0")
         val prdno = prdNorm.lpad(16, " ")
         return findProdutoPrdno(prdno)
       }
-      val split = query.split(" +".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-      
-      if (split.size == 2) {
+      val split = query.split(" +".toRegex())
+        .dropLastWhile {it.isEmpty()}
+        .toTypedArray()
+
+      if(split.size == 2) {
         val prdNorm = split[0].lpad(6, "0")
         val prdno = prdNorm.lpad(16, " ")
         val grade = split[1]
         val produtoOpt = findProduto(prdno, grade)
-        return produtoOpt?.let { listOf(it) } ?: emptyList()
+        return produtoOpt?.let {listOf(it)} ?: emptyList()
       }
-      
+
       return emptyList()
     }
-    
+
     fun findProduto(barra: String): List<Produto> {
-      return where().codbar.eq(barra).findList()
+      return where().codbar.eq(barra)
+        .findList()
     }
-    
+
     private fun findProdutoPrdno(prdno: String): List<Produto> {
-      return where().prdno.eq(prdno).findList()
+      return where().prdno.eq(prdno)
+        .findList()
     }
-    
+
     fun quantidadePalete(prdno: String): BigDecimal? {
       return sqlScalar<BigDecimal>("/sql/produtosPalete.sql".readFile(),
                                    ("prdno" to prdno))
-              .firstOrNull()
+        .firstOrNull()
     }
   }
-  
   private fun saldoSaci(bean: Produto): BigDecimal {
     return querySaci.saldoProduto(bean.prdno, bean.grade)
   }
-  
+  @Transactional
   fun recalculaSaldo() {
     scriptSql("/sql/recalculaSaldo.sql".readFile(), Pair("idProduto", id))
-    val inserts = true;
-    val updates = true
-    val deletes = false
-    Ebean.externalModification("saldos", inserts, updates, deletes);
   }
-  
+
   val transferencias: List<Transferencia>
     @Transient
-    get() {
-      return Transferencia.where().movProduto.produto.id.eq(id).findList()
-    }
-  
+    get() = Transferencia.where()
+      .movProduto.produto.id.eq(id)
+      .findList()
   val transferenciasPicking: List<Transferencia>
-    @Transient get() {
-      return movProdutoPicking.let { mp ->
-        mp.refresh()
-        mp.transferencias.orEmpty()
-      }
+    @Transient get() = movProdutoPicking.let {mp ->
+      mp.refresh()
+      mp.transferencias.orEmpty()
     }
-  
   val enderecosComSaldo: List<Endereco>
-    @Transient get() {
-      return Endereco.where().saldos.produto.id.eq(id)
-              .and().saldos.saldoConfirmado.gt(BigDecimal.ZERO)
-              .findList().distinct()
-    }
-  
+    @Transient get() = Endereco.where()
+      .saldos.produto.id.eq(id)
+      .and()
+      .saldos.saldoConfirmado.gt(BigDecimal.ZERO)
+      .findList()
+      .distinct()
   val enderecos: List<Endereco>
     @Transient get() {
       return Endereco.where()
-              .saldos.produto.id.eq(id)
-              .orderBy().saldos.ultEntrada.desc()
-              .findList().distinct()
+        .saldos.produto.id.eq(id)
+        .orderBy()
+        .saldos.ultEntrada.desc()
+        .findList()
+        .distinct()
     }
-  
   val saldosPulmao: List<Saldo>
     @Transient get() {
-      return Saldo.where().produto.id.eq(id)
-              .endereco.tipoNivel.eq(PULMAO)
-              .saldoConfirmado.ne(BigDecimal.ZERO).findList()
+      return Saldo.where()
+        .produto.id.eq(id)
+        .endereco.tipoNivel.eq(PULMAO)
+        .saldoConfirmado.ne(BigDecimal.ZERO)
+        .findList()
     }
-  
+
   fun saldoEm(endereco: Endereco): Saldo? {
-    return Saldo.where().produto.id.eq(id).endereco.id.eq(endereco.id).findOne()
+    return Saldo.where()
+      .produto.id.eq(id)
+      .endereco.id.eq(endereco.id)
+      .findOne()
   }
-  
+
   val movProdutoPicking: MovProduto
     @Transient get() {
       val movPicking = movimentacaoPicking()
@@ -170,20 +172,20 @@ class Produto : BaseModel() {
         this.save()
       }
     }
-  
+
   private fun montaChavePicking(): String {
-    return Movimentacao.montaChaveStr("PK", prdno.trim { it <= ' ' }.lpad(6, "0") + grade)
+    return Movimentacao.montaChaveStr("PK", prdno.trim {it <= ' '}.lpad(6, "0") + grade)
   }
-  
+
   private fun montaChaveTransferencia(): String {
-    return Movimentacao.montaChaveStr("TI", prdno.trim { it <= ' ' }.lpad(6, "0") + grade)
+    return Movimentacao.montaChaveStr("TI", prdno.trim {it <= ' '}.lpad(6, "0") + grade)
   }
-  
+
   private fun movimentacaoPicking(): Movimentacao {
     val chavePicking = montaChavePicking()
     val mov = Movimentacao.findMovimentacao(chavePicking)
     return mov ?: Movimentacao().apply {
-      this.documento = prdno.trim { it <= ' ' }
+      this.documento = prdno.trim {it <= ' '}
       this.observacao = "Picking"
       this.chave = chavePicking
       this.data = LocalDate.now()
@@ -191,12 +193,12 @@ class Produto : BaseModel() {
       this.save()
     }
   }
-  
+
   val movProdutoTransferencia: MovProduto
     @Transient get() {
       val movTransferencia = movimentacaoTransferencia()
       val mov = movTransferencia.findMovProduto(this)
-      return if (mov == null) {
+      return if(mov == null) {
         val mp = MovProduto()
         mp.movimentacao = movTransferencia
         mp.produto = this
@@ -204,37 +206,43 @@ class Produto : BaseModel() {
         mp.quantMov = BigDecimal.ZERO
         mp.save()
         mp
-      } else mov
+      }
+      else mov
     }
-  
+
   private fun movimentacaoTransferencia(): Movimentacao {
     val chaveTransferencia = montaChaveTransferencia()
     val movChave = Movimentacao.findMovimentacao(chaveTransferencia)
-    return if (movChave == null) {
+    return if(movChave == null) {
       val movimentacao = Movimentacao()
-      movimentacao.documento = prdno.trim { it <= ' ' }
+      movimentacao.documento = prdno.trim {it <= ' '}
       movimentacao.observacao = "Tranferencia Interna"
       movimentacao.chave = chaveTransferencia
       movimentacao.data = LocalDate.now()
       movimentacao.tipoMov = SAIDA
       movimentacao.save()
       movimentacao
-    } else movChave
+    }
+    else movChave
   }
-  
+
   @get:Transient
   val saldoPulmaoTotal: Double
     get() {
-      return saldosPulmao.map { s -> s.saldoConfirmado.toDouble() }.sum()
+      return saldosPulmao.map {s -> s.saldoConfirmado.toDouble()}
+        .sum()
     }
-  
+
   private fun zeraSaldosDel() {
-    Saldo.where().produto.id.eq(id).findList().forEach { saldo ->
-      saldo.run {
-        this.saldoConfirmado = BigDecimal.ZERO
-        this.saldoNConfirmado = BigDecimal.ZERO
-        this.update()
+    Saldo.where()
+      .produto.id.eq(id)
+      .findList()
+      .forEach {saldo ->
+        saldo.run {
+          this.saldoConfirmado = BigDecimal.ZERO
+          this.saldoNConfirmado = BigDecimal.ZERO
+          this.update()
+        }
       }
-    }
   }
 }

@@ -3,6 +3,7 @@ package br.com.astrosoft.view.enderecamento.vaadin.views.enderecamentoProduto
 import br.com.astrosoft.model.enderecamento.domain.ELado
 import br.com.astrosoft.model.enderecamento.domain.EPalet
 import br.com.astrosoft.model.enderecamento.domain.ETipoAltura
+import br.com.astrosoft.model.enderecamento.domain.RepositorioRua
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.viewmodel.enderecamento.presenters.enderecamentoProduto.TransferenciaEntradaHeaderModel
 import com.explicatis.ext_token_field.ExtTokenField
@@ -21,7 +22,8 @@ import com.vaadin.ui.VerticalLayout
 import org.vaadin.ui.NumberField
 import java.math.BigDecimal
 
-class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : Panel() {
+class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel,
+                                 val transferenciaEntradaGrid: TransferenciaEntradaGrid): Panel() {
   private val comboPalete: ComboBox<EPalet>
   private val comboLado: ComboBox<ELado>
   private val comboAltura: ComboBox<ETipoAltura>
@@ -32,17 +34,17 @@ class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : P
   private val codigo: TextField
   private val descricao: TextField
   private val quantPalete: NumberField
-  
+
   init {
     this.comboPalete = buildComboPalete()
     this.comboAltura = buildComboAltura()
     this.comboLado = buildChecklado()
-    
+
     this.tokenRuas = ExtTokenField()
     this.comboRuas = buildTokenRuas()
     this.tokenRuas.caption = "Ruas"
     this.tokenRuas.inputField = this.comboRuas
-    
+
     this.headerGrid = TransferenciaEntradaHeaderGrid(model)
     this.btnProcessa = buildBtnProcessa()
     this.codigo = buildTextLabelText("Código")
@@ -50,71 +52,73 @@ class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : P
     this.quantPalete = buildTextEditQuant("Quant. por Palete")
     content = buildContent()
   }
-  
+
   private fun buildBtnProcessa(): Button {
     val button = Button("Processa")
     button.icon = VaadinIcons.COGS
-    button.addClickListener { this.processaEnderecamento() }
+    button.addClickListener {this.processaEnderecamento()}
     return button
   }
-  
+
   private fun processaEnderecamento() {
+    model.removeTransferencia()
     model.processaEnderecamento()
   }
-  
-  fun mapToken(rua: Rua) = SimpleTokenizable(rua.id, rua.toString())
-  
+
+  fun mapToken(rua: RepositorioRua) = SimpleTokenizable(rua.rua_id, "Rua ${rua.rua}")
+
   private fun buildTokenRuas(): ComboBox<SimpleTokenizable> {
     val ruas = model.ruasPulmao
-    val tokenizables = ruas?.map { r ->
+    val tokenizables = ruas?.map {r ->
       mapToken(r)
-    }.orEmpty()
+    }
+      .orEmpty()
     val comboBox = ComboBox("Ruas", tokenizables)
-    comboBox.setItemCaptionGenerator { it.stringValue }
+    comboBox.setItemCaptionGenerator {it.stringValue}
     comboBox.addValueChangeListener(getComboBoxValueChange(this.tokenRuas))
     this.tokenRuas.setEnableDefaultDeleteTokenAction(true)
     return comboBox
   }
-  
+
   private fun getComboBoxValueChange(extTokenField: ExtTokenField) = ValueChangeListener<SimpleTokenizable> {
     val value = it.value
-    if (value != null) {
+    if(value != null) {
       extTokenField.addTokenizable(value)
       it.source.value = null
     }
   }
-  
+
   private fun buildChecklado(): ComboBox<ELado> {
     return ComboBox<ELado>("Lado").apply {
       isTextInputAllowed = false
       setItems(ELado.values().asList())
       this.emptySelectionCaption = "Ambos"
-      this.setItemCaptionGenerator { lado -> lado.toString() }
+      this.setItemCaptionGenerator {lado -> lado.toString()}
     }
   }
-  
+
   private fun buildComboAltura(): ComboBox<ETipoAltura> {
     val combo = ComboBox<ETipoAltura>("Altura do Palete")
     combo.setItems(*ETipoAltura.values())
     combo.isEmptySelectionAllowed = false
     combo.isTextInputAllowed = false
-    combo.setItemCaptionGenerator { p -> p.toString() }
+    combo.setItemCaptionGenerator {p -> p.toString()}
     combo.value = ETipoAltura.values()[0]
     return combo
   }
-  
+
   private fun buildComboPalete(): ComboBox<EPalet> {
     val combo = ComboBox<EPalet>("Largura do Palete")
     combo.setWidth("250px")
     combo.isEmptySelectionAllowed = false
     combo.isTextInputAllowed = false
     combo.setItems(*EPalet.values())
-    combo.setItemIconGenerator { p -> ThemeResource("img/paletes" + p.sigla + ".png") }
-    combo.setItemCaptionGenerator { p -> "     " + p.descricao }
+    combo.setItemIconGenerator {p -> ThemeResource("img/paletes" + p.sigla + ".png")}
+    combo.setItemCaptionGenerator {p -> "     " + p.descricao}
     combo.value = EPalet.values()[0]
     return combo
   }
-  
+
   private fun buildContent(): Component {
     val filtro = HorizontalLayout()
     filtro.addComponentsAndExpand(this.comboPalete, this.comboAltura, comboLado)
@@ -124,7 +128,6 @@ class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : P
       addComponent(btnProcessa)
       setComponentAlignment(btnProcessa, Alignment.BOTTOM_CENTER)
     }
-    
     val headerCampo = VerticalLayout(header, filtro, filtro2)
     headerCampo.setHeightUndefined()
     headerCampo.setWidth("100%")
@@ -138,7 +141,7 @@ class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : P
     layout.setHeightUndefined()
     return layout
   }
-  
+
   private fun buildHeaderMaster(): HorizontalLayout {
     this.descricao.setSizeFull()
     val layout = HorizontalLayout()
@@ -149,32 +152,34 @@ class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : P
     layout.setSizeFull()
     return layout
   }
-  
+
   private fun buildTextLabelText(caption: String): TextField {
     val textField = TextField(caption)
     textField.isReadOnly = true
     return textField
   }
-  
+
   private fun buildTextEditQuant(caption: String): NumberField {
     val numberField = NumberField(caption)
-    
+
     numberField.decimalPrecision = 0
     numberField.decimalSeparator = ','
     numberField.groupingSeparator = '.'
     numberField.isDecimalSeparatorAlwaysShown = false
     numberField.minimumFractionDigits = 0
-    
+
     return numberField
   }
-  
+
   fun updateView() {
-    quantPalete.value = model.quantPalete.intValueExact().toString()
+    quantPalete.value = model.quantPalete.intValueExact()
+      .toString()
     codigo.value = model.produto?.codigoGrade ?: ""
     descricao.value = model.produto?.nome ?: ""
     headerGrid.updateView()
+    transferenciaEntradaGrid.refresh()
   }
-  
+
   fun updateModel() {
     model.quantPalete = BigDecimal.valueOf(quantPalete.doubleValueDoNotThrow)
     model.lado = comboLado.value
@@ -183,7 +188,8 @@ class TransferenciaEntradaHeader(val model: TransferenciaEntradaHeaderModel) : P
     model.tokenRuas.clear()
     model.tokenRuas.addAll(tokenRuas.value.map {
       val id = it.identifier
-      this@TransferenciaEntradaHeader.model.ruasPulmao.orEmpty().first {rua -> rua.id == id }
+      this@TransferenciaEntradaHeader.model.ruasPulmao.orEmpty()
+        .first {rua -> rua.rua_id == id}
     })
     headerGrid.updateModel()
   }

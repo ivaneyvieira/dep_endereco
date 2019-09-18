@@ -4,6 +4,7 @@ import br.com.astrosoft.model.enderecamento.domain.ELado
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.NAO_OCUPADO
 import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.enderecamento.domain.Nivel
+import br.com.astrosoft.model.enderecamento.domain.RepositorioNivel
 import br.com.astrosoft.view.enderecamento.vaadin.Styles
 import br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito.LayoutLado
 import br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito.MapaNiveisAptosModel
@@ -15,7 +16,7 @@ import com.vaadin.ui.themes.ValoTheme
 import java.util.*
 
 class PanelNivel(
-  private val nivel: Nivel,
+  private val nivel: RepositorioNivel,
   private val lado: LayoutLado,
   posicao: EPosicaoNivel,
   private val nivelPredioModel: MapaNiveisAptosModel
@@ -47,16 +48,16 @@ class PanelNivel(
   }
 
   private fun buildAptos(): Component {
-    val eLado = this.nivel.predio?.lado
-    val aptos = this.lado.getAptos(nivel).sortedBy { it.numero }.let {
-      if (eLado === ELado.PAR) it.asReversed() else it
+    val eLado = this.nivel.lado
+    val aptos = this.lado.getAptos(nivel).sortedBy { it.apto }.let {
+      if (eLado === "PAR") it.asReversed() else it
     }
     val colunas = aptos.size
     val linha = 1
     val grid = GridLayout(colunas, linha)
 
     grid.setSizeFull()
-    val total = nivel.total()
+    val total = nivel.total ?: 0
     val resto = 30 - total
     var acumulado = 0
     val tamanhosVazios = when (resto) {
@@ -71,9 +72,9 @@ class PanelNivel(
     aptos.withIndex().forEach { (index, apto) ->
       val row = linha - 1
       val panelApto = PanelApto(apto, lado, nivelPredioModel)
-      this.mapPanelApto[apto.id] = panelApto
+      this.mapPanelApto[apto.apto_id] = panelApto
       grid.addComponent(panelApto, index, row, index, row)
-      val ocupado = apto.ocupacao != NAO_OCUPADO
+      val ocupado = apto.enderecoOcupado() != NAO_OCUPADO
       val tamanhoApto = if (ocupado)
         apto.tipoPalet.tamanho
       else
@@ -101,10 +102,10 @@ class PanelNivel(
 }
 
 private fun ArrayList<Int>.pop(): Int {
-  val f = firstOrNull()
-  return if (f == null) 0
+  val first = firstOrNull()
+  return if (first == null) 0
   else {
     removeAt(0)
-    f
+    first
   }
 }
