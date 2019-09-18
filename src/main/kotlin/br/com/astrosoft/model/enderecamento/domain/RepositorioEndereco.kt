@@ -4,17 +4,12 @@ import br.com.astrosoft.model.enderecamento.domain.EOcupacao.CINZA
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.ERRO
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.NAO_OCUPADO
 import br.com.astrosoft.model.enderecamento.domain.EOcupacao.OCUPADO
-import br.com.astrosoft.model.enderecamento.domain.EPalet.P
-import br.com.astrosoft.model.enderecamento.domain.ETipoAltura.BAIXA
-import br.com.astrosoft.model.enderecamento.domain.ETipoAltura.Companion
 import br.com.astrosoft.model.enderecamento.dtos.NivelApto
 import br.com.astrosoft.model.enderecamento.dtos.RuaPredio
 import br.com.astrosoft.model.framework.services.findById
 import br.com.astrosoft.model.framework.utils.readFile
 import io.ebean.Ebean
 import java.math.BigDecimal
-import com.vaadin.util.CurrentInstance.clearAll
-import io.ebean.cache.ServerCacheManager
 
 data class RepositorioEndereco(
   val rua_id: Long,
@@ -43,23 +38,41 @@ data class RepositorioEndereco(
   companion object {
     private val enderecos = mutableListOf<RepositorioEndereco>()
     private val layouts = mutableListOf<LayoutNivel>()
+    private val ruas = mutableListOf<Rua>()
+    private val predios = mutableListOf<Predio>()
+    private val niveis = mutableListOf<Nivel>()
+    private val aptos = mutableListOf<Apto>()
+
+    fun findRua(id: Long) = ruas.firstOrNull {it.id == id}
+    fun findPredio(id: Long) = predios.firstOrNull {it.id == id}
+    fun findNivel(id: Long) = niveis.firstOrNull {it.id == id}
+    fun findApto(id: Long) = aptos.firstOrNull {it.id == id}
 
     fun findNivelAptos(rua_id: Long, lado: ELado): List<NivelApto> {
       return RepositorioEndereco.enderecos.filter {it.rua_id == rua_id && lado.name == it.lado}
-        .map {
-          NivelApto(it)
+        .mapNotNull {
+          val nivel = it.toNivel().bean() ?: return@mapNotNull null
+          val apto = it.toApto().bean() ?: return@mapNotNull null
+          NivelApto(nivel, apto)
         }
         .distinct()
+    }
+
+    fun <T> MutableList<T>.set(list: List<T>) {
+      this.clear()
+      this.addAll(list)
     }
 
     fun updateRegistros() {
       val serverCacheManager = Ebean.getServerCacheManager()
       serverCacheManager.clearAll()
       val sql = "/sql/registroEndereco.sql".readFile()
-      layouts.clear()
-      layouts.addAll(LayoutNivel.all())
-      enderecos.clear()
-      enderecos.addAll(Ebean.findDto(RepositorioEndereco::class.java, sql).findList())
+      layouts.set(LayoutNivel.all())
+      enderecos.set(Ebean.findDto(RepositorioEndereco::class.java, sql).findList())
+      ruas.set(Rua.all())
+      predios.set(Predio.all())
+      niveis.set(Nivel.all())
+      aptos.set(Apto.all())
     }
 
     fun findLayout(nivelId: Long): LayoutNivel? {
@@ -82,8 +95,10 @@ data class RepositorioEndereco(
     fun enderecoOcupado(endereco_id: Long) =
       enderecos.firstOrNull {it.endereco_id == endereco_id}?.enderecoOcupado() ?: NAO_OCUPADO
 
-    fun ruasPredioDeposito() = enderecos.filter {it.rua != "00"}.map {
-      RuaPredio(it.toRua(), it.toPredio())
+    fun ruasPredioDeposito() = enderecos.filter {it.rua != "00"}.mapNotNull {
+      val rua = it.toRua().bean() ?: return@mapNotNull null
+      val predio = it.toPredio().bean() ?: return@mapNotNull null
+      RuaPredio(rua, predio)
     }.distinct()
 
     fun ruasPumao() = enderecos.filter {it.tipo_nivel == "PULMAO"}.map {it.toRua()}
@@ -155,7 +170,9 @@ data class RepositorioEndereco(
 data class RepositorioRua(
   val rua_id: Long,
   val rua: String
-                         )
+                         ) {
+  fun bean(): Rua? = RepositorioEndereco.findRua(rua_id)
+}
 
 data class RepositorioPredio(
   val predio_id: Long,
@@ -163,6 +180,7 @@ data class RepositorioPredio(
   val lado: String
                             ) {
   fun lado() = ELado.values().firstOrNull {it.name == lado}
+  fun bean(): Predio? = RepositorioEndereco.findPredio(predio_id)
 }
 
 data class RepositorioNivel(val nivel_id: Long,
@@ -186,6 +204,8 @@ data class RepositorioNivel(val nivel_id: Long,
     return value > 30 || value == 25
   }
 
+  fun bean(): Nivel? = RepositorioEndereco.findNivel(nivel_id)
+
   val aptos
     get() = RepositorioEndereco.aptosFromNiveis(nivel_id)
 }
@@ -201,6 +221,8 @@ data class RepositorioApto(val apto_id: Long,
                            val localizacao: String?) {
   fun enderecoOcupado() =
     RepositorioEndereco.enderecoOcupado(endereco_id ?: 0)
+
+  fun bean(): Apto? = RepositorioEndereco.findApto(apto_id)
 }
 
 enum class EOcupacao {

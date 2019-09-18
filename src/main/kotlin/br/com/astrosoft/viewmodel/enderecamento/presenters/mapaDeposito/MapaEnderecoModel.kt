@@ -3,7 +3,6 @@ package br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito
 import br.com.astrosoft.model.enderecamento.domain.Apto
 import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.framework.exceptions.ViewException
-import br.com.astrosoft.model.framework.services.findById
 
 class MapaEnderecoModel(val model: MapaDepositoViewModel) {
   var endereco: Endereco? = null
@@ -38,11 +37,5 @@ class MapaEnderecoModel(val model: MapaDepositoViewModel) {
         saldo.produto?.recalculaSaldo()
       }
     }
-  }
-
-  fun updateEnderco(enderecoId: Long?): Endereco? {
-    enderecoId ?: return null
-    endereco = Endereco.findById(enderecoId)
-    return endereco
   }
 }

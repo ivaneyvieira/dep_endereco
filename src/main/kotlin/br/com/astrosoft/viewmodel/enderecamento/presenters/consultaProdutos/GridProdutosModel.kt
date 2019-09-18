@@ -1,6 +1,7 @@
 package br.com.astrosoft.viewmodel.enderecamento.presenters.consultaProdutos
 
 import br.com.astrosoft.model.enderecamento.domain.Saldo
+import br.com.astrosoft.viewmodel.enderecamento.presenters.consultaPulmao.ConsultaPulmaoViewModel
 import br.com.astrosoft.viewmodel.framework.viewmodel.IListModel
 import java.util.*
 

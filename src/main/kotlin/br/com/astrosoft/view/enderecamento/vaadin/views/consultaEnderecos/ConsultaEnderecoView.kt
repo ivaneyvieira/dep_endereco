@@ -15,28 +15,28 @@ import com.vaadin.ui.VerticalLayout
               grupo = "Consulta", order = 33, tags = ["CON", "REC", "EXP"])
 class ConsultaEnderecoView : FormView<ConsultaEnderecoViewModel>(ConsultaEnderecoViewModel()) {
   private val fieldPesquisaEndereco: FieldPesquisaEndereco
-  private val gridConsultaProduto: GridConsultaProduto
+  private val gridConsultaPulmao: GridConsultaProduto
   
   init {
     title = "Consulta de Produtos por Endereço"
     fieldPesquisaEndereco = FieldPesquisaEndereco(model)
-    gridConsultaProduto = GridConsultaProduto(model.grid)
+    gridConsultaPulmao = GridConsultaProduto(model.grid)
   }
   
   override fun buildContentPanels(): Component {
     fieldPesquisaEndereco.setProcessaSaldos { model.grid.processaGrid() }
     val layout = VerticalLayout(fieldPesquisaEndereco)
-    layout.addComponentsAndExpand(gridConsultaProduto)
+    layout.addComponentsAndExpand(gridConsultaPulmao)
     return layout
   }
   
   override fun updateView() {
     fieldPesquisaEndereco.updateView()
-    gridConsultaProduto.updateView()
+    gridConsultaPulmao.updateView()
   }
   
   override fun updateModel() {
-    gridConsultaProduto.updateModel()
+    gridConsultaPulmao.updateModel()
     fieldPesquisaEndereco.updateModel()
   }
 }

@@ -229,8 +229,7 @@ class Produto: BaseModel() {
   @get:Transient
   val saldoPulmaoTotal: Double
     get() {
-      return saldosPulmao.map {s -> s.saldoConfirmado.toDouble()}
-        .sum()
+      return saldosPulmao.sumBy {s -> s.saldoConfirmado.toInt()}.toDouble()
     }
 
   private fun zeraSaldosDel() {

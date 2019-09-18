@@ -3,8 +3,6 @@ package br.com.astrosoft.viewmodel.enderecamento.presenters.mapaDeposito
 import br.com.astrosoft.model.enderecamento.domain.ELado
 import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.enderecamento.domain.Produto
-import br.com.astrosoft.model.enderecamento.domain.RepositorioEndereco
-import br.com.astrosoft.model.enderecamento.domain.RepositorioRua
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.model.enderecamento.dtos.NivelApto
 import br.com.astrosoft.model.enderecamento.dtos.RuaPredio
@@ -14,11 +12,8 @@ class MapaDepositoViewModel : ViewModel() {
   override fun reloadModel() {
     mapaRuasPredios.updateLayoutRuaPredio()
   }
-
-  init {
-    RepositorioEndereco.updateRegistros()
-  }
-
+  
+  //
   var mapaSelecionado: MapaModel? = null
   val mapaRuasPredios = MapaRuasPrediosModel(this)
   val mapaNiveisAptos = MapaNiveisAptosModel(this)
@@ -50,10 +45,10 @@ class MapaDepositoViewModel : ViewModel() {
   }
   
   fun getNivelAptos(
-    rua: RepositorioRua,
-    lado: ELado
+          rua: Rua,
+          lado: ELado
                    ): List<NivelApto> = execList {
-    RepositorioEndereco.findNivelAptos(rua.rua_id, lado)
+    rua.findNivelAptos(lado)
   }
   
   fun findRuasPredio(): List<RuaPredio> {

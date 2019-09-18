@@ -84,7 +84,7 @@ open class ViewVaadinUI(
       if (listViewAutorizado.size > 1) {
         userMenu {
           val username = currentUser.userName
-          val image = currentUser.fotoPerfil.makeResource()
+          val image = currentUser.fotoPerfil?.makeResource()
           item(username, image) {
             item("Perfil do usuário")
             item("Preferences")

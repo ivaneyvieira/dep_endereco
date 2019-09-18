@@ -29,7 +29,7 @@ class User : BaseModel() {
   var roles: MutableSet<Role> = HashSet()
   @Lob
   @Basic(fetch = FetchType.LAZY)
-  var fotoPerfil: ByteArray = ByteArray(0)
+  var fotoPerfil: ByteArray? = ByteArray(0)
   @Length(10)
   @Index(unique = true)
   var chapa: String = ""
@@ -72,7 +72,7 @@ class User : BaseModel() {
   }
   
   override fun update() {
-    if (this.fotoPerfil.isEmpty()) {
+    if (this.fotoPerfil == null || this.fotoPerfil?.isEmpty() == true) {
       val foto = queryTotvs.imagemChapa(chapa)
       foto.let { imagem ->
         val fotoByte = SystemUtils.resize(imagem?.imagem, 80, 100)
@@ -86,7 +86,7 @@ class User : BaseModel() {
   }
   
   override fun insert() {
-    if (this.fotoPerfil.isEmpty()) {
+    if (this.fotoPerfil == null || this.fotoPerfil?.isEmpty() == true) {
       val foto = queryTotvs.imagemChapa(chapa)
       foto.let { imagem ->
         val fotoByte = SystemUtils.resize(imagem?.imagem, 80, 100)
@@ -96,7 +96,7 @@ class User : BaseModel() {
     userSaci = userName
     val senha = querySaci.userSenha(userSaci)?.senha ?: ""
     passw = senha
-    this.insert()
+    super.insert()
   }
   
   companion object Find : UserFinder() {

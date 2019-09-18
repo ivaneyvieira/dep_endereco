@@ -146,7 +146,7 @@ dependencies {
   //compile ("com.vaadin:vaadin-context-menu:3.0.0")
   compile ("de.steinwedel.vaadin.addon:messagebox:4.0.21")
   compile ("org.vaadin.addons:extended-token-field:0.3.0")
-  compile ("org.vaadin.crudui:crudui:2.3.0")
+  compile ("org.vaadin.crudui:crudui:2.3.1")
   compile ("org.vaadin.teemu:switch:3.0.0")
   compile ("com.vaadin.addon:vaadin-onoffswitch:1.1.0")
   compile ("org.vaadin.patrik:GridFastNavigation:2.2.4")

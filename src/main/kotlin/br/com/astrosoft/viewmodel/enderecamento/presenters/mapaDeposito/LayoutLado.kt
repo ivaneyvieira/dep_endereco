@@ -6,19 +6,14 @@ import br.com.astrosoft.model.enderecamento.domain.ELado.PAR
 import br.com.astrosoft.model.enderecamento.domain.ETipoNivel.PICKING
 import br.com.astrosoft.model.enderecamento.domain.Nivel
 import br.com.astrosoft.model.enderecamento.domain.Predio
-import br.com.astrosoft.model.enderecamento.domain.RepositorioApto
-import br.com.astrosoft.model.enderecamento.domain.RepositorioNivel
-import br.com.astrosoft.model.enderecamento.domain.RepositorioPredio
-import br.com.astrosoft.model.enderecamento.domain.RepositorioRua
 import br.com.astrosoft.model.enderecamento.domain.Rua
 import br.com.astrosoft.model.enderecamento.dtos.NivelApto
 import java.util.*
 
-class LayoutLado(val rua: RepositorioRua, val lado: ELado, val predios: List<RepositorioPredio>, private val model:
-MapaDepositoViewModel) {
+class LayoutLado(val rua: Rua, val lado: ELado, val predios: List<Predio>, private val model: MapaDepositoViewModel) {
   private val nivelAptos = ArrayList<NivelApto>()
   val altura: Int? by lazy {
-    val intStream = predios.map {p -> alturaPredio(p)}
+    val intStream = predios.map { p -> alturaPredio(p) }
     intStream.max()
   }
 
@@ -27,53 +22,45 @@ MapaDepositoViewModel) {
     nivelAptos.addAll(model.getNivelAptos(rua, lado))
   }
 
-  private fun alturaPredio(predio: RepositorioPredio): Int {
+  private fun alturaPredio(predio: Predio): Int {
     return niveis(predio).size + 1
   }
 
-  fun niveis(predio: RepositorioPredio): List<RepositorioNivel> {
-    return nivelAptos.map {it.nivel}
-      .filter {n -> n.predio_id == predio.predio_id}
-      .distinct()
+  fun niveis(predio: Predio): List<Nivel> {
+    return nivelAptos.map { (nivel) -> nivel }.distinct().filter { n -> n.predio?.id == predio.id }
   }
 
-  private fun getQtPickinPredio(predio: RepositorioPredio): Int {
-    return nivelAptos.map {it.nivel}
-      .filter {n -> n.predio_id == predio.predio_id && n.tipo_nivel == "PICKING"}
-      .distinct()
-      .size
+  private fun getQtPickinPredio(predio: Predio): Int {
+    return nivelAptos.map { (nivel) -> nivel }.distinct()
+      .filter { n -> n.predio?.id == predio.id && n.tipoNivel === PICKING }.size
   }
 
-  fun outrosNiveis(nivel: Nivel): List<RepositorioNivel> {
+  fun outrosNiveis(nivel: Nivel): List<Nivel> {
     val predio = nivel.predio?.id
-    return nivelAptos.map {it.nivel}
-      .distinct()
-      .filter {n -> n.predio_id == predio}
-      .sortedBy {n -> n.tipo_nivel + n.nivel}
+    return nivelAptos.map { (n) -> n }.distinct()
+      .filter { n -> n.predio?.id == predio }
+      .sortedBy { n -> n.tipoNivel.toString() + n.numero }
   }
 
-  fun getAptos(nivel: RepositorioNivel): List<RepositorioApto> {
-    return nivelAptos.filter {na -> na.nivel.nivel_id == nivel.nivel_id}
-      .map {na -> na.apto}
-      .distinct()
+  fun getAptos(nivel: Nivel): List<Apto> {
+    return nivelAptos.filter { na -> na.nivel == nivel }.map { na -> na.apto }.distinct()
   }
 
-  fun calculaRow(nivel: RepositorioNivel, qtNiveis: Int): Int {
-    val numero = Integer.valueOf(nivel.nivel)
+  fun calculaRow(nivel: Nivel, qtNiveis: Int): Int {
+    val numero = Integer.valueOf(nivel.numero)
 
-    return if(nivel.tipo_nivel == "PICKING") qtNiveis - numero - 1
+    return if (nivel.tipoNivel == PICKING) qtNiveis - numero - 1
     else qtNiveis - qtPickin - numero - 1
   }
 
-  private val qtPickin: Int by lazy {predios.map {p -> getQtPickinPredio(p)}.max() ?: 0}
+  private val qtPickin: Int by lazy { predios.map { p -> getQtPickinPredio(p) }.max() ?: 0 }
 
-  fun calculaCol(predio: RepositorioPredio): Int {
+  fun calculaCol(predio: Predio): Int {
     val qtPredios = predios.size
-    val numero = Integer.valueOf(predio.predio)
-    return if(lado === PAR) {
+    val numero = Integer.valueOf(predio.numero)
+    return if (lado === PAR) {
       qtPredios - numero / 2 + 1
-    }
-    else {
+    } else {
       (numero + 1) / 2
     }
   }
