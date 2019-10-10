@@ -82,7 +82,9 @@ abstract class FormView<out MODEL : ViewModel>(model: MODEL) : VaadinView<MODEL>
     val header = HorizontalLayout()
     this.titleLabel.id = FormView.TITLE_ID
     this.titleLabel.setSizeUndefined()
-    this.titleLabel.addStyleName(ValoTheme.LABEL_HUGE)
+    this.titleLabel.addStyleName(ValoTheme.LABEL_H4)
+    this.titleLabel.addStyleName(ValoTheme.LABEL_BOLD)
+    this.titleLabel.addStyleName(ValoTheme.LABEL_NO_MARGIN)
     header.addComponentsAndExpand(this.titleLabel)
     header.addStyleName(ValoTheme.LAYOUT_WELL)
     
