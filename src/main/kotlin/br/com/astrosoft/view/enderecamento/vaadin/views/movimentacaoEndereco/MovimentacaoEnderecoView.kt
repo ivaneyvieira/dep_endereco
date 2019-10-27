@@ -86,9 +86,7 @@ class MovimentacaoEnderecoView : FormView<MovimentacaoEnderecoViewModel>(
 
         addColumn(ProdutosGrid::quantidade).apply {
           caption = "Quantidade"
-
         }
-
       }
     }
   }

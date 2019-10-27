@@ -1,5 +1,5 @@
 select C.cargano, cast(C.dataEntrega as date) as data, C.xanoNfr as xano,
-       A.custno, CT.name as cliente, N.prdno, N.grade, N.qtty/1000 as qtty
+       A.custno, CT.name as cliente, N.prdno, N.grade, N.qtty/1000 as quant
 from sqldados.eord AS E
          inner join sqldados.ctadd AS A
                     ON E.custno = A.custno

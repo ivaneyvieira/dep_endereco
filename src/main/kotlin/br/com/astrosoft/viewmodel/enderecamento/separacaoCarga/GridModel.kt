@@ -11,4 +11,9 @@ class GridModel(val model: SeparacaoCargaViewModel): IListModel<Carga>() {
     val numeroCarga = model.headerModel.numeroCarga
     list = Carga.findCarga(numeroCarga)
   }
+
+  fun listUpdate() : List<Carga>{
+    updateList()
+    return list.orEmpty()
+  }
 }
