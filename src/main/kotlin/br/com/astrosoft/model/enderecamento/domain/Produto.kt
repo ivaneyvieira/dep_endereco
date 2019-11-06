@@ -12,6 +12,7 @@ import br.com.astrosoft.model.framework.utils.lpad
 import br.com.astrosoft.model.framework.utils.readFile
 import io.ebean.annotation.Index
 import io.ebean.annotation.Length
+import io.ebean.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDate
 import javax.persistence.CascadeType.MERGE
@@ -22,8 +23,6 @@ import javax.persistence.Entity
 import javax.persistence.OneToMany
 import javax.persistence.Table
 import javax.persistence.Transient
-import io.ebean.Ebean
-import io.ebean.annotation.Transactional
 
 @Entity
 @Table(name = "produtos")
@@ -62,10 +61,8 @@ class Produto: BaseModel() {
   }
 
   companion object Find: ProdutoFinder() {
-    fun findProduto(
-      prdno: String, grade: String?
-                   ): Produto? {
-      return where().prdno.eq(prdno)
+    fun findProduto(prdno: String, grade: String?): Produto? {
+      return where().prdno.eq(prdno.lpad(16, " "))
         .and()
         .grade.eq(grade)
         .findOne()
@@ -109,9 +106,28 @@ class Produto: BaseModel() {
         .firstOrNull()
     }
   }
+
   private fun saldoSaci(bean: Produto): BigDecimal {
     return querySaci.saldoProduto(bean.prdno, bean.grade)
   }
+
+  fun tipoProdutoCarga(): String {
+    val transferencias = Transferencia.where()
+                           .movProduto.produto.eq(this)
+                           .enderecoS.localizacao.ne("RECEBIMENTO")
+                           .orderBy()
+                           .dataHoraMov.desc()
+                           .findList()
+                           .firstOrNull() ?: return ""
+    val endereco = transferencias.enderecoE ?: return ""
+    val localizacao = endereco.localizacao
+    val regex = """^[A-Z].+""".toRegex()
+    return if(regex matches localizacao)
+      "EMPILHADOR"
+    else
+      "EXPEDICAO"
+  }
+
   @Transactional
   fun recalculaSaldo() {
     scriptSql("/sql/recalculaSaldo.sql".readFile(), Pair("idProduto", id))
@@ -229,7 +245,8 @@ class Produto: BaseModel() {
   @get:Transient
   val saldoPulmaoTotal: Double
     get() {
-      return saldosPulmao.sumBy {s -> s.saldoConfirmado.toInt()}.toDouble()
+      return saldosPulmao.sumBy {s -> s.saldoConfirmado.toInt()}
+        .toDouble()
     }
 
   private fun zeraSaldosDel() {

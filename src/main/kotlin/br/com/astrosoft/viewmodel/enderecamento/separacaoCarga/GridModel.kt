@@ -14,6 +14,7 @@ class GridModel(val model: SeparacaoCargaViewModel): IListModel<Carga>() {
 
   fun listUpdate() : List<Carga>{
     updateList()
+    list?.forEach { it.initDestino()}
     return list.orEmpty()
   }
 }

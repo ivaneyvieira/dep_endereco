@@ -1,11 +1,13 @@
 package br.com.astrosoft.model.enderecamento.dtos
 
+import br.com.astrosoft.model.enderecamento.domain.Produto
 import br.com.astrosoft.model.framework.legado.querySaci
-import java.time.LocalDate
+import java.util.*
+import javax.persistence.Transient
 
 class Carga(
   val cargano: Int,
-  val data: LocalDate,
+  val data: Date,
   val xano: String,
   val custno: Int,
   val cliente: String,
@@ -15,6 +17,12 @@ class Carga(
            ) {
   val tipoNivel: String = ""
   var endereco: String = ""
+  @Transient
+  var destino: String = ""
+
+  fun initDestino() {
+    destino = Produto.findProduto(prdno, grade)?.tipoProdutoCarga() ?: ""
+  }
 
   companion object {
     fun findCarga(numeroCarga: Int?): List<Carga> {
