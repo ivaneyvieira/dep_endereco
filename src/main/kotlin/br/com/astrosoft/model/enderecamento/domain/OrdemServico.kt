@@ -19,7 +19,7 @@ import javax.persistence.Transient
 
 @Entity
 @Table(name = "ordensservico")
-class OrdemServico : BaseModel() {
+class OrdemServico: BaseModel() {
   @ManyToOne(cascade = [PERSIST, MERGE, REFRESH])
   var transferencia: Transferencia? = null
   @Index(unique = true)
@@ -28,41 +28,36 @@ class OrdemServico : BaseModel() {
   var dataHoraConf: LocalDateTime? = null
   @ManyToOne(cascade = [PERSIST, MERGE, REFRESH])
   var user: User? = null
-  
   @get:Transient
   val produto: Produto?
     get() {
       return transferencia?.movProduto?.produto
     }
-  
   @get:Transient
   val confimacao: Boolean
     get() {
       return transferencia?.confirmacao ?: false
     }
-  
   @get:Transient
   val tipoMov: EMovTipo?
     get() = transferencia?.tipoMov
-    
-  
   @get:Transient
   val status: String
     get() {
-      return if (confimacao) "Concluído" else "Pendente"
+      return if(confimacao) "Concluído" else "Pendente"
     }
   
   fun confirmaOS(confirma: Boolean) {
-    transferencia?.let { transferencia ->
+    transferencia?.let {transferencia ->
       transferencia.confirmacao = confirma
       transferencia.save()
       transferencia.movProduto?.produto?.recalculaSaldo()
     }
   }
   
-  companion object Find : OrdemServicoFinder() {
+  companion object Find: OrdemServicoFinder() {
     fun findOrdemServicoUser(idUser: Long, osPendente: Boolean): List<OrdemServico> {
-      val query = if (osPendente)
+      val query = if(osPendente)
         where().user.id.eq(idUser).and().transferencia.confirmacao.eq(false)
       else
         where().user.id.eq(idUser)
@@ -70,37 +65,42 @@ class OrdemServico : BaseModel() {
     }
     
     fun findOrdemServico(
-            dataInicial: LocalDate?, dataFinal: LocalDate?, confirmado: Boolean, empilhador: User?, rua: Rua?,
-            produto: Produto?
+      dataInicial: LocalDate?, dataFinal: LocalDate?, confirmado: Boolean, empilhador: User?, rua: Rua?,
+      produto: Produto?
                         ): List<OrdemServico> {
       val sql = "/sql/findOrdemServico.sql".readFile()
       val dataI = dataInicial ?: LocalDate.now()
       val dataF = dataFinal ?: LocalDate.now()
       DB.scriptSql(sql)
-
+      
       return where()
-              .or()
-              .user.id.notIn(User.quebec()?.id)
-              .user.isNull
-              .endOr()
-              .transferencia.confirmacao.eq(confirmado)
-              .dataHora.between(LocalDateTime.of(dataI, LocalTime.MIN), LocalDateTime.of(dataF, LocalTime.MAX))
-              .let {where ->
-                produto?.let {
-                  where.transferencia.movProduto.produto.id.eq(it.id)
-                } ?: where
-              }
-              .let {where ->
-                empilhador?.let {
-                  where.user.id.eq(it.id)
-                } ?: where
-              }
-              .let {where ->
-                rua?.let {
-                  where.transferencia.enderecoE.apto.nivel.predio.rua.id.eq(it.id)
-                } ?: where
-              }
-              .findList()
+        .or()
+        .user.id.notIn(User.quebec()?.id)
+        .user.isNull
+        .endOr()
+        .transferencia.confirmacao.eq(confirmado)
+        .dataHora.between(LocalDateTime.of(dataI, LocalTime.MIN), LocalDateTime.of(dataF, LocalTime.MAX))
+        .let {where ->
+          produto?.let {
+            where.transferencia.movProduto.produto.id.eq(it.id)
+          } ?: where
+        }
+        .let {where ->
+          empilhador?.let {
+            where.user.id.eq(it.id)
+          } ?: where
+        }
+        .let {where ->
+          rua?.let {
+            where.transferencia.enderecoE.apto.nivel.predio.rua.id.eq(it.id)
+          } ?: where
+        }
+        .findList()
+    }
+    
+    fun novaOrdemServico(): OrdemServico {
+      return novaOrdemServico().apply {
+      }
     }
   }
 }

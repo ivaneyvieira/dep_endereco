@@ -1,12 +1,8 @@
 package br.com.astrosoft.model.enderecamento.domain
 
-import br.com.astrosoft.model.enderecamento.domain.EOcupacao.CINZA
-import br.com.astrosoft.model.enderecamento.domain.EOcupacao.ERRO
-import br.com.astrosoft.model.enderecamento.domain.EOcupacao.NAO_OCUPADO
-import br.com.astrosoft.model.enderecamento.domain.EOcupacao.OCUPADO
 import br.com.astrosoft.model.enderecamento.domain.ETipoEndereco.DEPOSITO
+import br.com.astrosoft.model.enderecamento.domain.ETipoEndereco.EXPEDICAO
 import br.com.astrosoft.model.enderecamento.domain.ETipoEndereco.RECEBIMENTO
-import br.com.astrosoft.model.enderecamento.domain.ETipoNivel.PICKING
 import br.com.astrosoft.model.enderecamento.domain.ETipoNivel.PULMAO
 import br.com.astrosoft.model.enderecamento.domain.finder.EnderecoFinder
 import br.com.astrosoft.model.framework.entityManager.DB.scriptSql
@@ -31,7 +27,7 @@ import javax.persistence.Transient
 @Entity
 @Table(name = "enderecos")
 @Index(unique = true, columnNames = ["tipo_endereco", "localizacao", "tipo_nivel"])
-class Endereco : BaseModel() {
+class Endereco: BaseModel() {
   @Enumerated(EnumType.STRING)
   var tipoEndereco: ETipoEndereco = DEPOSITO
   @Length(100)
@@ -47,22 +43,19 @@ class Endereco : BaseModel() {
   var tipoPalet: EPalet?
     @Transient get() = apto?.tipoPalet
     @Transient set(value) {
-      value?.let { tipoPalet ->
+      value?.let {tipoPalet ->
         apto?.tipoPalet = tipoPalet
         apto?.save()
       }
     }
   val tipoAltura: ETipoAltura?
     @Transient get() = apto?.tipoAltura
-
+  
   override fun toString(): String {
     return descricao ?: ""
   }
-
+  
   val nivel @Transient get() = apto?.nivel
-
-
-
   @Formula(select = "(CASE tipo_endereco\n" +
                     "         WHEN 'DEPOSITO' THEN CONCAT(tipo_nivel, ' ', localizacao)\n" +
                     "         WHEN 'RECEBIMENTO' THEN 'Recebimento'\n" +
@@ -71,48 +64,53 @@ class Endereco : BaseModel() {
   val descricao: String? = ""
   val rua @Transient get() = predio?.rua
   val predio @Transient get() = nivel?.predio
-
-  companion object Find : EnderecoFinder() {
+  
+  companion object Find: EnderecoFinder() {
     fun recebimento(): Endereco {
       return where().tipoEndereco.eq(RECEBIMENTO).findOne() ?: throw ViewException(
         "Não há endereco de recebimento cadastrado")
     }
-
+    
     fun enrederecoPickingQuebec(): Endereco? = findEndereco(ETipoNivel.PULMAO, "00-00-00-00")
-
+    
     private fun findEndereco(
       tipoNivel: ETipoNivel, localizacao: String
                             ): Endereco? {
-      return where().tipoNivel.eq(tipoNivel).and().localizacao.eq(localizacao).endAnd().findOne()
+      return where().tipoNivel.eq(tipoNivel)
+        .and()
+        .localizacao.eq(localizacao)
+        .endAnd()
+        .findOne()
     }
-
+    
     fun findEnderecoPiking(strEndereco: String): Endereco? = findEndereco(ETipoNivel.PICKING, strEndereco)
-
+    
     val enderecosPicking: List<Endereco> by lazy {
       val enderecos: List<Endereco> = findAll()
-      enderecos.filter { e ->
+      enderecos.filter {e ->
         e.tipoNivel == ETipoNivel.PICKING || e.tipoEndereco == ETipoEndereco.EXPEDICAO
       }
     }
-
     val enderecosPulmao: List<Endereco>
       get() {
         return where().tipoNivel.eq(PULMAO)
           .findList()
       }
-
+    
     fun enderecoPiking(produto: Produto): List<Endereco> {
       return where().saldos.produto.id.eq(produto.id)
         .and()
         .tipoEndereco.eq(DEPOSITO)
-        .endAnd().findList().distinct()
+        .endAnd()
+        .findList()
+        .distinct()
     }
-
+    
     fun changeApto(origem: String, tipo: String, destino: String) {
       val sql = "/sql/transferenciaEndereco.sql"
       scriptSql(sql.readFile(), ("origem" to origem), ("tipo" to tipo), ("destino" to destino))
     }
-
+    
     fun findEnderecoPulmao(localizacao: String?): Endereco? {
       localizacao ?: return null
       return where()
@@ -121,6 +119,11 @@ class Endereco : BaseModel() {
         .findList()
         .firstOrNull()
     }
+    
+    fun enderecosExpedicao() = Endereco.where()
+      .tipoEndereco.eq(EXPEDICAO)
+      .orderBy().localizacao.asc()
+      .findList()
   }
 }
 
@@ -128,7 +131,7 @@ enum class ETipoEndereco(private val descricao: String) {
   DEPOSITO("Depósito"),
   RECEBIMENTO("Recebimento"),
   EXPEDICAO("Expedição");
-
+  
   override fun toString(): String {
     return descricao
   }

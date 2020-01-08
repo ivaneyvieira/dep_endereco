@@ -20,7 +20,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "users")
-class User : BaseModel() {
+class User: BaseModel() {
   @Length(20)
   @Index(unique = true)
   var userName: String = ""
@@ -46,14 +46,14 @@ class User : BaseModel() {
   var passw: String = ""
   
   override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
-    if (!super.equals(other)) return false
-    
+    if(this === other) return true
+    if(javaClass != other?.javaClass) return false
+    if(!super.equals(other)) return false
+  
     other as User
-    
-    if (userName != other.userName) return false
-    
+  
+    if(userName != other.userName) return false
+  
     return true
   }
   
@@ -68,13 +68,13 @@ class User : BaseModel() {
   }
   
   fun hasTag(tag: String): Boolean {
-    return roles.any { it.tag == tag }
+    return roles.any {it.tag == tag}
   }
   
   override fun update() {
-    if (this.fotoPerfil == null || this.fotoPerfil?.isEmpty() == true) {
+    if(this.fotoPerfil == null || this.fotoPerfil?.isEmpty() == true) {
       val foto = queryTotvs.imagemChapa(chapa)
-      foto.let { imagem ->
+      foto.let {imagem ->
         val fotoByte = SystemUtils.resize(imagem?.imagem, 80, 100)
         fotoPerfil = fotoByte ?: kotlin.ByteArray(0)
       }
@@ -86,9 +86,9 @@ class User : BaseModel() {
   }
   
   override fun insert() {
-    if (this.fotoPerfil == null || this.fotoPerfil?.isEmpty() == true) {
+    if(this.fotoPerfil == null || this.fotoPerfil?.isEmpty() == true) {
       val foto = queryTotvs.imagemChapa(chapa)
-      foto.let { imagem ->
+      foto.let {imagem ->
         val fotoByte = SystemUtils.resize(imagem?.imagem, 80, 100)
         fotoPerfil = fotoByte ?: kotlin.ByteArray(0)
       }
@@ -99,21 +99,33 @@ class User : BaseModel() {
     super.insert()
   }
   
-  companion object Find : UserFinder() {
+  companion object Find: UserFinder() {
     fun findUser(name: String?): User? {
-      return where().userName.eq(name).findOne()
+      return where().userName.eq(name)
+        .findOne()
     }
     
     fun findEmpilhadores(): List<User> {
       return findByRole("Empilhador")
     }
     
-    fun findByRole(roleName : String) : List<User>{
-      return where().roles.name.eq(roleName).findList()
+    fun findByRole(roleName: String): List<User> {
+      return where().roles.name.eq(roleName)
+        .findList()
     }
-  
+    
     fun quebec(): User? {
-      return User.where().userName.eq("QUEBEC").findOne()
+      return User.where()
+        .userName.eq("QUEBEC")
+        .findOne()
+    }
+    
+    fun separadores(): List<User> {
+      return User.where()
+        .roles.tag.eq("EMP")
+        .orderBy()
+        .firstName.asc()
+        .findList()
     }
   }
 }

@@ -8,8 +8,10 @@ import br.com.astrosoft.model.framework.entityManager.DB.sqlScalar
 import br.com.astrosoft.model.framework.legado.querySaci
 import br.com.astrosoft.model.framework.services.BaseModel
 import br.com.astrosoft.model.framework.services.cacheValue
+import br.com.astrosoft.model.framework.services.findById
 import br.com.astrosoft.model.framework.utils.lpad
 import br.com.astrosoft.model.framework.utils.readFile
+import io.ebean.DB
 import io.ebean.annotation.Index
 import io.ebean.annotation.Length
 import io.ebean.annotation.Transactional
@@ -99,18 +101,38 @@ class Produto: BaseModel() {
       return where().prdno.eq(prdno)
         .findList()
     }
-
+  
     fun quantidadePalete(prdno: String): BigDecimal? {
       return sqlScalar<BigDecimal>("/sql/produtosPalete.sql".readFile(),
                                    ("prdno" to prdno))
         .firstOrNull()
     }
   }
-
+  
+  fun proximoEnderecoPulmao(): Endereco? {
+    val sql = "/sql/pesquisaFilaPulmao.sql"
+    val textFile = sql.readFile()
+    val row = DB.sqlQuery(textFile)
+      .setParameter(1, this.id)
+      .findOne()
+    val enderecoID = row?.getLong("endereco_id") ?: 0
+    return Endereco.findById(enderecoID)
+  }
+  
+  fun proximoEnderecoPiking(): Endereco? {
+    val sql = "/sql/pesquisaFilaPicking.sql"
+    val textFile = sql.readFile()
+    val row = DB.sqlQuery(textFile)
+      .setParameter(1, this.id)
+      .findOne()
+    val enderecoID = row?.getLong("endereco_id") ?: 0
+    return Endereco.findById(enderecoID)
+  }
+  
   private fun saldoSaci(bean: Produto): BigDecimal {
     return querySaci.saldoProduto(bean.prdno, bean.grade)
   }
-
+  
   fun tipoProdutoCarga(): String {
     val transferencias = Transferencia.where()
                            .movProduto.produto.eq(this)

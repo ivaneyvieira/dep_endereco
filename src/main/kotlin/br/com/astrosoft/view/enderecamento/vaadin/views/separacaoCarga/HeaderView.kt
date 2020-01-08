@@ -1,25 +1,45 @@
 package br.com.astrosoft.view.enderecamento.vaadin.views.separacaoCarga
 
+import br.com.astrosoft.model.enderecamento.domain.Endereco
+import br.com.astrosoft.model.enderecamento.domain.User
 import com.github.mvysny.karibudsl.v8.alignment
 import com.github.mvysny.karibudsl.v8.button
+import com.github.mvysny.karibudsl.v8.comboBox
 import com.github.mvysny.karibudsl.v8.textField
-import com.vaadin.icons.VaadinIcons
+import com.vaadin.shared.ui.ValueChangeMode.LAZY
 import com.vaadin.ui.Alignment
+import com.vaadin.ui.ComboBox
 import com.vaadin.ui.HorizontalLayout
 import com.vaadin.ui.TextField
-import java.awt.SystemColor.text
 
 class HeaderView(view: SeparacaoCargaView): HorizontalLayout() {
-  val text: TextField = textField("Número da Carga") {
-  }
-
+  var cmbUsurio: ComboBox<User>
+  val cmbExpedicao: ComboBox<Endereco>
+  val text: TextField
+  
   init {
-    button {
-      icon = VaadinIcons.CHECK_CIRCLE_O
-      alignment = Alignment.BOTTOM_LEFT
-      addClickListener {
-        view.model.headerModel.numeroCarga = text.value.toIntOrNull() ?: 0
+    text = textField("Número da Carga") {
+      this.valueChangeMode = LAZY
+      addValueChangeListener {
+        val value = it.value
+        view.model.headerModel.numeroCarga = value.toIntOrNull() ?: 0
         view.gridView.update()
+      }
+    }
+    cmbExpedicao = comboBox("Doca de Expedição") {
+      this.isTextInputAllowed = false
+      this.isEmptySelectionAllowed = false
+      this.setItems(view.model.enderecosExpedicao())
+    }
+    cmbUsurio = comboBox<User>("Separador") {
+      this.isTextInputAllowed = false
+      this.isEmptySelectionAllowed = false
+      this.setItems(view.model.sepradores())
+    }
+    button("Processamento") {
+      alignment = Alignment.BOTTOM_RIGHT
+      addClickListener {
+        view.model.processamento()
       }
     }
   }

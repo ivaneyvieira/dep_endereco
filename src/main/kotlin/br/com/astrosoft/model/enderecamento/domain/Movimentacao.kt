@@ -63,9 +63,20 @@ class Movimentacao : BaseModel() {
       val novoNumero = numero + 1
       return montaChaveStr(prefixo, novoNumero.toString())
     }
-
-    fun novaTransferencia(novaObservacao : String): Movimentacao {
+  
+    fun novaTransferencia(novaObservacao: String): Movimentacao {
       val chaveNova = proximaChave("TR")
+      return Movimentacao().apply {
+        this.chave = chaveNova
+        this.documento = chaveNova
+        this.observacao = novaObservacao
+        this.tipoMov = TRANSFERENCIA
+        save()
+      }
+    }
+  
+    fun novaCarga(novaObservacao: String): Movimentacao {
+      val chaveNova = proximaChave("CG")
       return Movimentacao().apply {
         this.chave = chaveNova
         this.documento = chaveNova
