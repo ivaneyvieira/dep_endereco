@@ -6,25 +6,24 @@ import io.ebean.Ebean
 import javax.persistence.PersistenceException
 
 object DB {
-  
   fun <R> xa(lambda: () -> R): R {
     return try {
       lambda()
-    } catch (e: AppException) {
+    } catch(e: AppException) {
       throw e
-    } catch (e: Throwable) {
+    } catch(e: Throwable) {
       throw DevException(e, "Erro desconhecido")
     }
   }
   
   @Throws(PersistenceException::class)
   fun executeSqls(
-          sqls: List<String>, vararg params: Pair<String, Any?>
+    sqls: List<String>, vararg params: Pair<String, Any?>
                  ) {
-    sqls.forEach { sql ->
+    sqls.forEach {sql ->
       println(sql)
       val update = Ebean.createSqlUpdate(sql)
-      params.forEach { param ->
+      params.forEach {param ->
         update.setParameter(param.first, param.second)
       }
       update.execute()
@@ -32,14 +31,14 @@ object DB {
   }
   
   fun String.split(): List<String> {
-    return this/*.replace("::=", ":=").replace(":=", "::=")*/.split(";").map { it.replace('\n', ' ') }.map { it.trim() }
-            .filter { it.isNotEmpty() }
+    return this/*.replace("::=", ":=").replace(":=", "::=")*/.split(";")
+      .map {it.replace('\n', ' ')}
+      .map {it.trim()}
+      .filter {it.isNotEmpty()}
   }
   
   @Throws(PersistenceException::class)
-  fun scriptSql(
-          sqlScript: String, vararg params: Pair<String, Any>
-               ) {
+  fun scriptSql(sqlScript: String, vararg params: Pair<String, Any?>) {
     xa {
       val sqls = sqlScript.split()
       executeSqls(sqls, * params)
@@ -89,26 +88,25 @@ object DB {
       }
     }
   }*/
-  
   @Throws(PersistenceException::class)
   inline fun <reified T> sqlScalar(
-          sqlScript: String, vararg params: Pair<String, Any>
+    sqlScript: String, vararg params: Pair<String, Any>
                                   ): List<T> {
     return xa {
       val sqls = sqlScript.split()
       val sqlsScript = sqls.dropLast(1)
-      
+  
       executeSqls(sqlsScript, * params)
-      
       val sql = sqls.last()
       println(sql)
-      
       val sqlQuery = Ebean.createSqlQuery(sql)
-      
-      params.forEach { param ->
+  
+      params.forEach {param ->
         sqlQuery.setParameter(param.first, param.second)
       }
-      sqlQuery.findList().filter { it is T }.map { it as T }
+      sqlQuery.findList()
+        .filter {it is T}
+        .map {it as T}
     }
   }
 }

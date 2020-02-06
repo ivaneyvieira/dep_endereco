@@ -4,4 +4,5 @@ interface IBinder {
   fun updateModel()
   fun updateView()
   fun errorNotify(errorMenssage: String)
+  fun infoNotify(infoMessage: String)
 }

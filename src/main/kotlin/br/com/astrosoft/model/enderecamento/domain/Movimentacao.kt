@@ -20,7 +20,7 @@ import javax.persistence.Table
 
 @Entity
 @Table(name = "movimentacoes")
-class Movimentacao : BaseModel() {
+class Movimentacao: BaseModel() {
   @Length(20)
   @Index(unique = true)
   var chave: String = ""
@@ -33,26 +33,27 @@ class Movimentacao : BaseModel() {
   var tipoMov: EMovTipo = ENTRADA
   @OneToMany(mappedBy = "movimentacao", cascade = [PERSIST, MERGE, REFRESH])
   var movProdutos: List<MovProduto>? = null
-
-  companion object Find : MovimentacaoFinder() {
+  
+  companion object Find: MovimentacaoFinder() {
     fun findNotaEntrada(invno: Int): Movimentacao? {
       val chaveEntrada = montaChaveEntrada(invno)
       return findMovimentacao(chaveEntrada)
     }
-
+    
     fun findMovimentacao(chaveEntrada: String): Movimentacao? {
-      return where().chave.eq(chaveEntrada).findOne()
+      return where().chave.eq(chaveEntrada)
+        .findOne()
     }
-
+    
     fun montaChaveStr(prefixo: String, str: String): String {
-      return prefixo + if (str.length > 8) return str
+      return prefixo + if(str.length > 8) return str
       else str.lpad(8, "0")
     }
-
+    
     fun montaChaveEntrada(invno: Int): String {
       return montaChaveStr("NE", invno.toString())
     }
-
+    
     private fun proximaChave(prefixo: String): String {
       val ultimaChave = where()
                           .select("max(chave)")
@@ -63,7 +64,7 @@ class Movimentacao : BaseModel() {
       val novoNumero = numero + 1
       return montaChaveStr(prefixo, novoNumero.toString())
     }
-  
+    
     fun novaTransferencia(novaObservacao: String): Movimentacao {
       val chaveNova = proximaChave("TR")
       return Movimentacao().apply {
@@ -74,21 +75,22 @@ class Movimentacao : BaseModel() {
         save()
       }
     }
-  
-    fun novaCarga(novaObservacao: String): Movimentacao {
+    
+    fun novaCarga(documento: String, novaObservacao: String): Movimentacao {
       val chaveNova = proximaChave("CG")
       return Movimentacao().apply {
         this.chave = chaveNova
-        this.documento = chaveNova
+        this.documento = documento
         this.observacao = novaObservacao
         this.tipoMov = TRANSFERENCIA
         save()
       }
     }
   }
-
+  
   fun findMovProduto(produto: Produto): MovProduto? {
-    return QMovProduto().where().movimentacao.id.eq(id)
+    return QMovProduto().where()
+      .movimentacao.id.eq(id)
       .produto.id.eq(produto.id)
       .findOne()
   }
@@ -107,7 +109,7 @@ enum class EStatusEntrada(private val descricao: String) {
   ENDERECADA("Endereçado"),
   CONFERIDA("Conferida"),
   INCONSISTENTE("Inconsistente");
-
+  
   override fun toString(): String {
     return descricao
   }

@@ -16,4 +16,8 @@ interface View : IBinder {
   override fun errorNotify(errorMenssage: String) {
     showError(errorMenssage)
   }
+  
+  override fun infoNotify(infoMessage: String) {
+    showInfo(infoMessage)
+  }
 }

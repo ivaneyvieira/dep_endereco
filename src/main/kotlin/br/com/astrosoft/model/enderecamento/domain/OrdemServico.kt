@@ -68,10 +68,9 @@ class OrdemServico: BaseModel() {
       dataInicial: LocalDate?, dataFinal: LocalDate?, confirmado: Boolean, empilhador: User?, rua: Rua?,
       produto: Produto?
                         ): List<OrdemServico> {
-      val sql = "/sql/findOrdemServico.sql".readFile()
+      updateOrdemServio()
       val dataI = dataInicial ?: LocalDate.now()
       val dataF = dataFinal ?: LocalDate.now()
-      DB.scriptSql(sql)
       
       return where()
         .or()
@@ -97,10 +96,10 @@ class OrdemServico: BaseModel() {
         }
         .findList()
     }
-    
-    fun novaOrdemServico(): OrdemServico {
-      return novaOrdemServico().apply {
-      }
+  
+    fun updateOrdemServio(userId: Long? = null) {
+      val sql = "/sql/findOrdemServico.sql".readFile()
+      DB.scriptSql(sql, Pair("user_id", userId))
     }
   }
 }

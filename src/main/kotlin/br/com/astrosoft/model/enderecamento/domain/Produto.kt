@@ -1,6 +1,8 @@
 package br.com.astrosoft.model.enderecamento.domain
 
 import br.com.astrosoft.model.enderecamento.domain.EMovTipo.SAIDA
+import br.com.astrosoft.model.enderecamento.domain.ETipoCarga.EMPILHADOR
+import br.com.astrosoft.model.enderecamento.domain.ETipoCarga.EXPEDICAO
 import br.com.astrosoft.model.enderecamento.domain.ETipoNivel.PULMAO
 import br.com.astrosoft.model.enderecamento.domain.finder.ProdutoFinder
 import br.com.astrosoft.model.framework.entityManager.DB.scriptSql
@@ -57,11 +59,11 @@ class Produto: BaseModel() {
     prdno.trim {it <= ' '} + " " + grade
   }
   val saldoSaci by cacheValue {saldoSaci(this)}
-
+  
   override fun toString(): String {
     return codigoGrade ?: ""
   }
-
+  
   companion object Find: ProdutoFinder() {
     fun findProduto(prdno: String, grade: String?): Produto? {
       return where().prdno.eq(prdno.lpad(16, " "))
@@ -69,7 +71,7 @@ class Produto: BaseModel() {
         .grade.eq(grade)
         .findOne()
     }
-
+    
     fun findProdutoQuery(query: String): List<Produto> {
       if(query.trim().length <= 6) {
         val prdNorm = query.trim()
@@ -80,7 +82,7 @@ class Produto: BaseModel() {
       val split = query.split(" +".toRegex())
         .dropLastWhile {it.isEmpty()}
         .toTypedArray()
-
+      
       if(split.size == 2) {
         val prdNorm = split[0].lpad(6, "0")
         val prdno = prdNorm.lpad(16, " ")
@@ -88,20 +90,20 @@ class Produto: BaseModel() {
         val produtoOpt = findProduto(prdno, grade)
         return produtoOpt?.let {listOf(it)} ?: emptyList()
       }
-
+      
       return emptyList()
     }
-
+    
     fun findProduto(barra: String): List<Produto> {
       return where().codbar.eq(barra)
         .findList()
     }
-
+    
     private fun findProdutoPrdno(prdno: String): List<Produto> {
       return where().prdno.eq(prdno)
         .findList()
     }
-  
+    
     fun quantidadePalete(prdno: String): BigDecimal? {
       return sqlScalar<BigDecimal>("/sql/produtosPalete.sql".readFile(),
                                    ("prdno" to prdno))
@@ -133,28 +135,28 @@ class Produto: BaseModel() {
     return querySaci.saldoProduto(bean.prdno, bean.grade)
   }
   
-  fun tipoProdutoCarga(): String {
+  fun tipoProdutoCarga(): ETipoCarga? {
     val transferencias = Transferencia.where()
                            .movProduto.produto.eq(this)
                            .enderecoS.localizacao.ne("RECEBIMENTO")
                            .orderBy()
                            .dataHoraMov.desc()
                            .findList()
-                           .firstOrNull() ?: return ""
-    val endereco = transferencias.enderecoE ?: return ""
+                           .firstOrNull() ?: return null
+    val endereco = transferencias.enderecoE ?: return null
     val localizacao = endereco.localizacao
     val regex = """^[A-Z].+""".toRegex()
     return if(regex matches localizacao)
-      "EMPILHADOR"
+      EMPILHADOR
     else
-      "EXPEDICAO"
+      EXPEDICAO
   }
-
+  
   @Transactional
   fun recalculaSaldo() {
     scriptSql("/sql/recalculaSaldo.sql".readFile(), Pair("idProduto", id))
   }
-
+  
   val transferencias: List<Transferencia>
     @Transient
     get() = Transferencia.where()
@@ -189,14 +191,14 @@ class Produto: BaseModel() {
         .saldoConfirmado.ne(BigDecimal.ZERO)
         .findList()
     }
-
+  
   fun saldoEm(endereco: Endereco): Saldo? {
     return Saldo.where()
       .produto.id.eq(id)
       .endereco.id.eq(endereco.id)
       .findOne()
   }
-
+  
   val movProdutoPicking: MovProduto
     @Transient get() {
       val movPicking = movimentacaoPicking()
@@ -210,15 +212,15 @@ class Produto: BaseModel() {
         this.save()
       }
     }
-
+  
   private fun montaChavePicking(): String {
     return Movimentacao.montaChaveStr("PK", prdno.trim {it <= ' '}.lpad(6, "0") + grade)
   }
-
+  
   private fun montaChaveTransferencia(): String {
     return Movimentacao.montaChaveStr("TI", prdno.trim {it <= ' '}.lpad(6, "0") + grade)
   }
-
+  
   private fun movimentacaoPicking(): Movimentacao {
     val chavePicking = montaChavePicking()
     val mov = Movimentacao.findMovimentacao(chavePicking)
@@ -231,7 +233,7 @@ class Produto: BaseModel() {
       this.save()
     }
   }
-
+  
   val movProdutoTransferencia: MovProduto
     @Transient get() {
       val movTransferencia = movimentacaoTransferencia()
@@ -247,7 +249,7 @@ class Produto: BaseModel() {
       }
       else mov
     }
-
+  
   private fun movimentacaoTransferencia(): Movimentacao {
     val chaveTransferencia = montaChaveTransferencia()
     val movChave = Movimentacao.findMovimentacao(chaveTransferencia)
@@ -263,14 +265,14 @@ class Produto: BaseModel() {
     }
     else movChave
   }
-
+  
   @get:Transient
   val saldoPulmaoTotal: Double
     get() {
       return saldosPulmao.sumBy {s -> s.saldoConfirmado.toInt()}
         .toDouble()
     }
-
+  
   private fun zeraSaldosDel() {
     Saldo.where()
       .produto.id.eq(id)
@@ -283,4 +285,9 @@ class Produto: BaseModel() {
         }
       }
   }
+}
+
+enum class ETipoCarga(val numero: Int, val descricao: String) {
+  EMPILHADOR(1, "Empilhador"),
+  EXPEDICAO(2, "Expedição")
 }

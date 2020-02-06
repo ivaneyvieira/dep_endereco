@@ -1,8 +1,12 @@
 package br.com.astrosoft.viewmodel.enderecamento.separacaoCarga
 
+import br.com.astrosoft.model.enderecamento.domain.ETipoCarga
+import br.com.astrosoft.model.enderecamento.domain.ETipoCarga.EXPEDICAO
 import br.com.astrosoft.model.enderecamento.domain.Endereco
 import br.com.astrosoft.model.enderecamento.domain.MovProduto
 import br.com.astrosoft.model.enderecamento.domain.Movimentacao
+import br.com.astrosoft.model.enderecamento.domain.OrdemServico
+import br.com.astrosoft.model.enderecamento.domain.Produto
 import br.com.astrosoft.model.enderecamento.domain.Transferencia
 import br.com.astrosoft.model.enderecamento.domain.User
 import br.com.astrosoft.model.enderecamento.dtos.Carga
@@ -28,19 +32,22 @@ class SeparacaoCargaViewModel(): ViewModel() {
   }
   
   fun processamento() = exec {
-    if(view.listagemCarga.size == 0)
+    if(view.listagemCarga.isEmpty())
       throw ViewException("A carga não possui itens")
     val cargaNo = view.cargaNo ?: throw ViewException("Número da carga não foi informado")
-    val separador = view.usuarioSeparador ?: throw ViewException("Usuário não selecionado")
+    val separador = view.usuarioSeparador ?: throw ViewException("Separador não selecionado")
+    val empilhador = view.usuarioEmpilhador ?: throw ViewException("Empilhador não selecionado")
     val doca = view.enderecoDoca ?: throw ViewException("Endereco da doca não foi informado")
-    val movimentacao = Movimentacao.novaCarga("Transferencia para a carga $cargaNo")
+    val movimentacao = Movimentacao.novaCarga(cargaNo.toString(), "Transferencia para a carga $cargaNo")
     val agrupaProdutos =
       view.listagemCarga.filter {it.enderecoOrigem != null}
-        .groupBy {it.produto}
+        .groupBy {ProdutoDestino(it.produto, it.destino)}
         .filter {it.value.isNotEmpty()}
-    
+  
     agrupaProdutos.forEach {grupo ->
-      grupo.key?.let {produto ->
+      grupo.key.let {produtoDestino ->
+        val produto = produtoDestino.produto ?: return@let null
+        val destino = produtoDestino.destino ?: return@let null
         val carga = grupo.value
         val enderecoOrigem =
           carga.firstOrNull()
@@ -48,23 +55,38 @@ class SeparacaoCargaViewModel(): ViewModel() {
         val quantTotal =
           carga.sumByDouble {it.quant}
             .toBigDecimal()
-        val movProduto = MovProduto.novaMovimentacaoProduto(movimentacao, produto, quantTotal)
+        val movProduto = MovProduto
+          .novaMovimentacaoProduto(movimentacao, produto, quantTotal)
         enderecoOrigem?.let {origem ->
           Transferencia.novaTranferencia(origem, doca, movProduto, quantTotal)
-          //TODO Falta atribuir o usuario à tranferencia do PICKING parta expedição
+          if(destino == EXPEDICAO)
+            OrdemServico.updateOrdemServio(separador.id)
+          else
+            OrdemServico.updateOrdemServio(empilhador.id)
+        }
+        grupo.value.forEach {cg ->
+          cg.marcaProcessado()
         }
       }
     }
+    binder?.infoNotify("Operação realizada com sucesso!!!")
   }
   
   fun sepradores(): List<User> {
     return User.separadores()
   }
+  
+  fun enderecos(): List<Endereco> {
+    return Endereco.enderecosPicking.sortedBy {it.localizacao}
+  }
 }
+
+data class ProdutoDestino(val produto: Produto?, val destino: ETipoCarga?)
 
 interface ISeparacaoCargaViewModel {
   var cargaNo: Int?
   var enderecoDoca: Endereco?
   var usuarioSeparador: User?
+  var usuarioEmpilhador: User?
   val listagemCarga: List<Carga>
 }

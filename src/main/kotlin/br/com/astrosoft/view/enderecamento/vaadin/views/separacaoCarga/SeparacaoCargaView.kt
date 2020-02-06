@@ -37,7 +37,11 @@ class SeparacaoCargaView: FormView<SeparacaoCargaViewModel>(SeparacaoCargaViewMo
   }
   
   override fun updateView() {
-    //Vazio
+    gridView.update()
+  }
+  
+  fun enderecos(): List<Endereco> {
+    return model.enderecos()
   }
   
   override var cargaNo: Int?
@@ -51,9 +55,14 @@ class SeparacaoCargaView: FormView<SeparacaoCargaViewModel>(SeparacaoCargaViewMo
       headerView.cmbExpedicao.value = value
     }
   override var usuarioSeparador: User?
-    get() = headerView.cmbUsurio.value
+    get() = headerView.cmbSeparador.value
     set(value) {
-      headerView.cmbUsurio.value = value
+      headerView.cmbSeparador.value = value
+    }
+  override var usuarioEmpilhador: User?
+    get() = headerView.cmbEmpilhador.value
+    set(value) {
+      headerView.cmbEmpilhador.value = value
     }
   override val listagemCarga: List<Carga>
     get() = gridView.provider.getAll()

@@ -1,0 +1,12 @@
+UPDATE sqldados.awnfr AS C INNER JOIN sqldados.nfrprd AS N ON N.xano = C.xanoNfr AND
+                                                              N.pdvno = C.pdvnoNfr AND
+                                                              N.storeno = C.storenoNfr
+SET N.c1 = :marca,
+    N.c2 = :endereco,
+    N.s1 = :destino
+WHERE C.cargano = :cargano
+  AND C.xanoNfr = :xano
+  AND N.prdno = :prdno
+  AND N.grade = :grade
+  AND C.storeno = 10
+  AND C.statusCarga = 0

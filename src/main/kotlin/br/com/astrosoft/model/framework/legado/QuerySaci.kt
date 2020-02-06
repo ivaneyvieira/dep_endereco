@@ -19,7 +19,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
     nfInvno?.addProdutos(produtoNotaEntrada(nfInvno.invno ?: 0))
     return nfInvno
   }
-
+  
   fun notaEntrada(invno: Int): NotaEntrada? {
     val sql = "/sql/notaEntradaInv.sql"
     val notaEntrada = query(sql) {q ->
@@ -31,7 +31,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
     }
     return notaEntrada
   }
-
+  
   private fun produtoNotaEntrada(invno: Int): List<ProdutoNotaEntrada> {
     val sql = "/sql/produtoNotaEntrada.sql"
     return query(sql) {q ->
@@ -39,7 +39,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetch(ProdutoNotaEntrada::class.java)
     }
   }
-
+  
   private fun notaEntrada(
     nfname: String,
     invse: String
@@ -51,7 +51,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetchFirst(NotaEntrada::class.java)
     }
   }
-
+  
   fun notaEntrada(notaSerie: String): NotaEntrada? {
     if(notaSerie.contains("/")) {
       val nota = notaSerie.split("/".toRegex()).dropLastWhile {it.isEmpty()}.toTypedArray()[0]
@@ -60,7 +60,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
     }
     return null
   }
-
+  
   fun produto(codbar: String): ProdutoSaci? {
     val sql = "/sql/produtoCodbar.sql"
     return query(sql) {q ->
@@ -68,7 +68,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetchFirst(ProdutoSaci::class.java)
     }
   }
-
+  
   fun produtos(prdno: String): List<ProdutoSaci> {
     val sql = "/sql/produtoCodGrade.sql"
     return query(sql) {q ->
@@ -77,7 +77,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetch(ProdutoSaci::class.java)
     }
   }
-
+  
   fun produto(
     prdno: String,
     grade: String?
@@ -89,7 +89,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetchFirst(ProdutoSaci::class.java)
     }
   }
-
+  
   fun userSenha(login: String): UserSenha? {
     val sql = "/sql/userSenha.sql"
     return query(sql) {q ->
@@ -97,7 +97,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetchFirst(UserSenha::class.java)
     }
   }
-
+  
   fun saldoProduto(
     prdno: String,
     grade: String
@@ -109,16 +109,16 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeScalar(BigDecimal::class.java)
     } ?: BigDecimal.ZERO
   }
-
+  
   fun notaEntradaAll(query: String): List<NotaEntrada> {
     val sql = "/sql/notaEntradaAll.sql"
-
+    
     return query(sql) {q ->
       q.addParameter("query", "%$query%")
         .executeAndFetch(NotaEntrada::class.java)
     }.orEmpty()
   }
-
+  
   fun findCarga(cargano: Int): List<Carga> {
     val sql = "/sql/cargaSeparacao.sql"
     return query(sql) {q ->
@@ -126,7 +126,24 @@ class QuerySaci: QueryDB(driver, url, username, password) {
         .executeAndFetch(Carga::class.java)
     }.orEmpty()
   }
-
+  
+  fun updateItemCarga(cargano: Int, xano: String, prdno: String, grade: String, endereco: String, destino: Int,
+                      marca: Boolean) {
+    val sql = "/sql/updateItemCarga.sql"
+    
+    query(sql) {q ->
+      q.addParameter("cargano", cargano)
+      q.addParameter("xano", xano)
+      q.addParameter("prdno", prdno)
+      q.addParameter("grade", grade)
+      q.addParameter("marca", if(marca) "X" else "")
+      q.addParameter("endereco", endereco)
+      q.addParameter("destino", destino)
+      
+      q.executeUpdate()
+    }
+  }
+  
   companion object {
     private val db = DB("saci")
     internal val driver = db.driver

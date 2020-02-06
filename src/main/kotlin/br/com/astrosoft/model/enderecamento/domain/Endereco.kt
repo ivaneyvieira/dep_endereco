@@ -88,7 +88,7 @@ class Endereco: BaseModel() {
     val enderecosPicking: List<Endereco> by lazy {
       val enderecos: List<Endereco> = findAll()
       enderecos.filter {e ->
-        e.tipoNivel == ETipoNivel.PICKING || e.tipoEndereco == ETipoEndereco.EXPEDICAO
+        e.tipoNivel == ETipoNivel.PICKING || e.tipoEndereco == EXPEDICAO
       }
     }
     val enderecosPulmao: List<Endereco>
