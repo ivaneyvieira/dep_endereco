@@ -277,6 +277,7 @@ class Produto: BaseModel() {
     Saldo.where()
       .produto.id.eq(id)
       .findList()
+      .toList()
       .forEach {saldo ->
         saldo.run {
           this.saldoConfirmado = BigDecimal.ZERO

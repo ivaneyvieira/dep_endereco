@@ -22,7 +22,8 @@ class Carga(
   val storenoStk: Int,
   val marca: String,
   val destinoCarga: Int,
-  val enderecoCarga: String
+  val enderecoCarga: String,
+  val miv: Boolean
            ) {
   val processado: Boolean
     get() = marca == "X"

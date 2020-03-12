@@ -46,8 +46,8 @@ class SeparacaoCargaViewModel(): ViewModel() {
   
     agrupaProdutos.forEach {grupo ->
       grupo.key.let {produtoDestino ->
-        val produto = produtoDestino.produto ?: return@let null
-        val destino = produtoDestino.destino ?: return@let null
+        val produto = produtoDestino.produto ?: return@let
+        val destino = produtoDestino.destino ?: return@let
         val carga = grupo.value
         val enderecoOrigem =
           carga.firstOrNull()
