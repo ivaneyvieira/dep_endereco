@@ -27,4 +27,4 @@ FROM sqldados.eord            AS E
 WHERE C.cargano = :cargano
   AND C.storeno = 10
   AND C.statusCarga = 0
-GROUP BY C.cargano, N.storeno, N.prdno, N.xano, N.prdno, N.grade;
+GROUP BY C.cargano, N.storeno, N.prdno, N.xano, N.prdno, N.grade
